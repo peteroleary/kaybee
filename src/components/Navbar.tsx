@@ -116,14 +116,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 h-12 bg-slate-950/80 backdrop-blur-xl border-b border-white/10 text-slate-100 px-3 flex items-center justify-between gap-2 shadow-2xl shrink-0">
+    <header className="sticky top-0 z-40 h-12 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-slate-100 px-3 flex items-center justify-between gap-2 shrink-0">
       
       {/* Left Group: Brand Mark & Board Dropdown & Search */}
       <div className="flex items-center gap-2">
         {/* Brand Mark */}
         <div 
-          className="w-8 h-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-400 rounded-lg flex items-center justify-center font-black text-sm text-white shadow-md shadow-indigo-500/20 cursor-default"
-          title="KB3.0 EVO-KANBAN Master Environment"
+          className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-xs text-white shadow-sm cursor-default"
+          title="KB Master Board Environment"
         >
           K
         </div>
@@ -132,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold text-slate-100 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-xs font-semibold text-slate-200 transition-colors"
             title={`Active Board: ${activeBoard.name}. Click to switch boards.`}
           >
             <Layers className="w-3.5 h-3.5 text-indigo-400" />
@@ -141,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {dropdownOpen && (
-            <div className="absolute top-full left-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-xl shadow-2xl z-50 overflow-hidden py-1">
+            <div className="absolute top-full left-0 mt-1.5 w-60 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden py-1">
               <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Boards ({boards.length})
               </div>
@@ -152,26 +152,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onSelectBoard(board.id);
                     setDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-white/10 transition-colors ${
-                    board.id === activeBoardId ? 'bg-indigo-600/30 text-indigo-200 font-semibold border-l-2 border-indigo-400' : 'text-slate-200'
+                  className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-800 transition-colors ${
+                    board.id === activeBoardId ? 'bg-indigo-600/20 text-indigo-300 font-semibold border-l-2 border-indigo-500' : 'text-slate-300'
                   }`}
                 >
                   <span className="truncate">{board.name}</span>
                   {board.id === activeBoardId && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
                   )}
                 </button>
               ))}
-              <div className="border-t border-white/10 mt-1 pt-1 px-1 space-y-0.5">
+              <div className="border-t border-slate-800 mt-1 pt-1 px-1 space-y-0.5">
                 <button
                   onClick={() => {
                     onOpenNewBoard();
                     setDropdownOpen(false);
                   }}
-                  className="w-full text-left px-2.5 py-1.5 text-xs text-indigo-300 hover:bg-indigo-500/20 rounded-lg flex items-center gap-2"
+                  className="w-full text-left px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-lg flex items-center gap-2"
                   title="Create New Board"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5 text-indigo-400" />
                   <span>New Board</span>
                 </button>
 
@@ -181,10 +181,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onOpenSaveTemplate();
                       setDropdownOpen(false);
                     }}
-                    className="w-full text-left px-2.5 py-1.5 text-xs text-cyan-300 hover:bg-cyan-500/20 rounded-lg flex items-center gap-2"
+                    className="w-full text-left px-2.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-lg flex items-center gap-2"
                     title="Save active board as a reusable template"
                   >
-                    <BookmarkPlus className="w-3.5 h-3.5" />
+                    <BookmarkPlus className="w-3.5 h-3.5 text-indigo-400" />
                     <span>Save Board as Template</span>
                   </button>
                 )}
@@ -196,27 +196,25 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Global Search Icon Button */}
         <button
           onClick={onOpenSearch}
-          className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 hover:text-white transition-colors"
+          className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-slate-300 transition-colors"
           title="Search Cards, Lists, Tags (Ctrl + K)"
         >
-          <Search className="w-3.5 h-3.5 text-indigo-400" />
+          <Search className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </div>
 
-      {/* Middle Group: Icon-Only Action Tools with Hover Labels */}
+      {/* Middle Group: Clean Toolbar Buttons */}
       <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar px-1">
         
         {/* Add List Tool */}
         {onAddList && (
           <button
             onClick={onAddList}
-            className="group flex items-center p-2 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 transition-all duration-300 shadow-sm"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 text-xs font-medium transition-colors"
             title="Add New Column / List to Canvas"
           >
-            <ListPlus className="w-4 h-4 text-indigo-300 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Add List
-            </span>
+            <ListPlus className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden md:inline">Add List</span>
           </button>
         )}
 
@@ -224,17 +222,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onToggleHeatmap && (
           <button
             onClick={onToggleHeatmap}
-            className={`group flex items-center p-2 rounded-lg border transition-all duration-300 ${
+            className={`p-1.5 rounded-lg border transition-colors ${
               isHeatmapActive
-                ? 'bg-rose-500/30 border-rose-500/60 text-rose-200 shadow-md shadow-rose-500/20'
-                : 'bg-white/10 hover:bg-rose-500/20 border-white/10 text-slate-300 hover:text-white'
+                ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/60 text-slate-400 hover:text-slate-200'
             }`}
-            title="Toggle Velocity Heatmap Layer"
+            title={isHeatmapActive ? "Velocity Heatmap Active" : "Toggle Velocity Heatmap Layer"}
           >
-            <Flame className={`w-4 h-4 shrink-0 ${isHeatmapActive ? 'text-rose-400 animate-bounce' : 'text-slate-400'}`} />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              {isHeatmapActive ? 'Heatmap On' : 'Heatmap'}
-            </span>
+            <Flame className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -242,55 +237,44 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onToggleSmartFilter && (
           <button
             onClick={onToggleSmartFilter}
-            className={`group flex items-center p-2 rounded-lg border transition-all duration-300 ${
+            className={`p-1.5 rounded-lg border transition-colors ${
               smartFilterActive
-                ? 'bg-amber-500/30 border-amber-500/60 text-amber-200 shadow-md shadow-amber-500/20'
-                : 'bg-white/10 hover:bg-white/20 border-white/10 text-slate-300 hover:text-white'
+                ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-300'
+                : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/60 text-slate-400 hover:text-slate-200'
             }`}
-            title="Smart Filter: Collapse Inactive Lists"
+            title={smartFilterActive ? "Smart Filter Active" : "Smart Filter: Collapse Inactive Lists"}
           >
-            <Filter className={`w-4 h-4 shrink-0 ${smartFilterActive ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              {smartFilterActive ? 'Smart Filter On' : 'Smart Filter'}
-            </span>
+            <Filter className="w-3.5 h-3.5" />
           </button>
         )}
 
         {/* AI Orchestrator Trigger */}
         <button
           onClick={onOpenOrchestrator}
-          className="group flex items-center p-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border border-white/20 text-white shadow-md shadow-indigo-600/30 transition-all duration-300"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-colors"
           title="AI Orchestrator Routine Engine (Gemini)"
         >
-          <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow shrink-0" />
-          <span className="max-w-0 opacity-0 group-hover:max-w-36 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-            AI Orchestrator
-          </span>
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>AI Orchestrator</span>
         </button>
 
         {/* Board Router / Interconnect Trigger */}
         <button
           onClick={onOpenInterconnect}
-          className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-purple-500/20 border border-white/10 text-slate-300 hover:text-purple-300 transition-all duration-300"
+          className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
           title="Board Interconnectivity & Feed-Forward Router"
         >
-          <GitFork className="w-4 h-4 text-purple-400 shrink-0" />
-          <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-            Interconnect
-          </span>
+          <GitFork className="w-3.5 h-3.5" />
         </button>
 
         {/* Overview Map & Dependency Graph */}
         {onOpenOverviewMap && (
           <button
             onClick={onOpenOverviewMap}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-indigo-500/20 border border-white/10 text-slate-300 hover:text-indigo-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Overview Map & Dependency Graph"
           >
-            <Network className="w-4 h-4 text-indigo-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Overview Map
-            </span>
+            <Network className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -298,13 +282,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenVoice && (
           <button
             onClick={onOpenVoice}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-rose-500/20 border border-white/10 text-slate-300 hover:text-rose-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Voice-to-Action Listener"
           >
-            <Mic className="w-4 h-4 text-rose-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Voice Assistant
-            </span>
+            <Mic className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -312,13 +293,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenAnalytics && (
           <button
             onClick={onOpenAnalytics}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 border border-white/10 text-slate-300 hover:text-cyan-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Analytics Telemetry Dashboard"
           >
-            <BarChart3 className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Analytics
-            </span>
+            <BarChart3 className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -326,13 +304,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenThemeModal && (
           <button
             onClick={onOpenThemeModal}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-purple-500/20 border border-white/10 text-slate-300 hover:text-purple-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Change Board Theme & Background Canvas"
           >
-            <Palette className="w-4 h-4 text-purple-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Board Theme
-            </span>
+            <Palette className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -340,39 +315,30 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenAutoArchiveModal && (
           <button
             onClick={onOpenAutoArchiveModal}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-amber-500/20 border border-white/10 text-slate-300 hover:text-amber-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Auto-Archive Routine Rules"
           >
-            <Archive className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Auto-Archive
-            </span>
+            <Archive className="w-3.5 h-3.5" />
           </button>
         )}
 
         {/* Templates Library */}
         <button
           onClick={onOpenTemplates}
-          className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 hover:text-white transition-all duration-300"
+          className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
           title="Board Template Library"
         >
-          <Layout className="w-4 h-4 text-indigo-400 shrink-0" />
-          <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-            Templates
-          </span>
+          <Layout className="w-3.5 h-3.5" />
         </button>
 
         {/* Save as Template Tool */}
         {onOpenSaveTemplate && (
           <button
             onClick={onOpenSaveTemplate}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 border border-white/10 text-slate-300 hover:text-cyan-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Save Active Board Layout as Custom Template"
           >
-            <BookmarkPlus className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-36 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Save Template
-            </span>
+            <BookmarkPlus className="w-3.5 h-3.5" />
           </button>
         )}
 
@@ -380,33 +346,27 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onExportBoardImage && (
           <button
             onClick={onExportBoardImage}
-            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-emerald-500/20 border border-white/10 text-slate-300 hover:text-emerald-300 transition-all duration-300"
+            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Export High-Resolution Board Image"
           >
-            <Download className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-              Export Image
-            </span>
+            <Download className="w-3.5 h-3.5" />
           </button>
         )}
 
         {/* Tag / Hashtag Filter Modal Trigger Button */}
         <button
           onClick={onOpenTagManagerModal}
-          className={`group flex items-center p-2 rounded-lg border transition-all duration-300 relative ${
+          className={`p-1.5 rounded-lg border transition-colors relative ${
             selectedTagFilter
-              ? 'bg-indigo-600/30 border-indigo-500/60 text-indigo-200 shadow-md shadow-indigo-500/20 ring-1 ring-indigo-500/50'
-              : 'bg-white/10 hover:bg-indigo-500/20 border-white/10 text-slate-300 hover:text-indigo-300'
+              ? 'bg-indigo-600/30 border-indigo-500/60 text-indigo-300'
+              : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/60 text-slate-400 hover:text-slate-200'
           }`}
-          title={selectedTagFilter ? `Active Tag Filter: #${selectedTagFilter}. Click to manage tags & filters.` : "Filter & Manage Hashtag Tags"}
+          title={selectedTagFilter ? `Active Tag Filter: #${selectedTagFilter}` : "Filter & Manage Hashtags"}
         >
-          <Tag className={`w-4 h-4 shrink-0 ${selectedTagFilter ? 'text-indigo-300' : 'text-indigo-400'}`} />
+          <Tag className="w-3.5 h-3.5" />
           {selectedTagFilter && (
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse border border-slate-900" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-indigo-400 border border-slate-900" />
           )}
-          <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
-            {selectedTagFilter ? `#${selectedTagFilter}` : 'Filter Tags'}
-          </span>
         </button>
       </div>
 
@@ -414,25 +374,25 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="flex items-center gap-1.5 shrink-0">
         
         {/* Canvas Zoom Widget */}
-        <div className="flex items-center bg-white/10 border border-white/10 rounded-lg p-0.5 text-xs">
+        <div className="flex items-center bg-slate-800/80 border border-slate-700/60 rounded-lg p-0.5 text-xs">
           <button
             onClick={() => onChangeZoom(-0.1)}
-            className="p-1 text-slate-300 hover:bg-white/15 rounded transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-200 rounded transition-colors"
             title="Zoom Out"
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
-          <span className="px-1.5 font-mono text-[11px] text-indigo-300 font-bold">{Math.round(zoomLevel * 100)}%</span>
+          <span className="px-1.5 font-mono text-[11px] text-slate-300 font-medium">{Math.round(zoomLevel * 100)}%</span>
           <button
             onClick={() => onChangeZoom(0.1)}
-            className="p-1 text-slate-300 hover:bg-white/15 rounded transition-colors"
+            className="p-1 text-slate-400 hover:text-slate-200 rounded transition-colors"
             title="Zoom In"
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onResetPan}
-            className="p-1 text-slate-400 hover:text-slate-200 border-l border-white/10 transition-colors"
+            className="p-1 text-slate-500 hover:text-slate-300 border-l border-slate-700 transition-colors"
             title="Reset Canvas Position (100%)"
           >
             <RotateCcw className="w-3 h-3" />
@@ -443,16 +403,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="relative">
           <button
             onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-            className={`p-1.5 rounded-lg border text-xs backdrop-blur-md transition-colors flex items-center gap-1 ${roleColors[currentRole]}`}
+            className="p-1.5 rounded-lg border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition-colors flex items-center gap-1"
             title={`Role: ${currentRole.replace('_', ' ').toUpperCase()}`}
           >
-            <ShieldCheck className="w-4 h-4" />
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
           </button>
 
           {roleDropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-44 bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-xl shadow-2xl z-50 overflow-hidden py-1">
+            <div className="absolute right-0 top-full mt-1.5 w-40 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden py-1">
               <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                RBAC Access Level
+                Access Level
               </div>
               {(['admin', 'contributor', 'ai_operator', 'viewer'] as RBACRole[]).map(role => (
                 <button
@@ -461,8 +421,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onChangeRole(role);
                     setRoleDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-1.5 text-xs capitalize flex items-center justify-between hover:bg-white/10 ${
-                    currentRole === role ? 'font-bold text-indigo-300 bg-indigo-500/20' : 'text-slate-300'
+                  className={`w-full text-left px-3 py-1.5 text-xs capitalize flex items-center justify-between hover:bg-slate-800 ${
+                    currentRole === role ? 'font-semibold text-indigo-300 bg-indigo-600/20' : 'text-slate-300'
                   }`}
                 >
                   <span>{role.replace('_', ' ')}</span>
@@ -476,10 +436,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Real-Time Telemetry & Activity Feed */}
         <button
           onClick={onToggleActivity}
-          className="relative p-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 hover:text-white transition-colors"
-          title="Activity Telemetry Feed"
+          className="relative p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-slate-300 transition-colors"
+          title="Activity Log"
         >
-          <Activity className="w-4 h-4 text-emerald-400" />
+          <Activity className="w-3.5 h-3.5 text-slate-400" />
           {activityCount > 0 && (
             <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-indigo-500 text-[9px] font-bold text-white flex items-center justify-center border border-slate-900">
               {activityCount > 9 ? '9+' : activityCount}
