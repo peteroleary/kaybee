@@ -1,0 +1,6 @@
+{
+  "name": "KB3.0 - Next-Gen Collaborative Kanban",
+  "description": "Evolutionary infinite-canvas kanban board with AI orchestrator agent, chat feed lists, heterogeneous human-agent swarms, and interactive card widgets.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
