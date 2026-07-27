@@ -140,6 +140,7 @@ export interface ListConfig {
   feedForwardTargetListId?: string;
   autoRunAgents: boolean;
   isTwoColumns?: boolean;
+  width?: number;
   autoSortByPriority?: boolean;
   rbacRole: RBACRole;
   cards: CardItemData[];

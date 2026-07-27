@@ -14,7 +14,11 @@ import {
   GitFork, 
   Archive,
   Command,
-  ArrowRight
+  ArrowRight,
+  Lightbulb,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface VoiceActionModalProps {
@@ -32,6 +36,7 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
   const [transcript, setTranscript] = useState('');
   const [lastActionStatus, setLastActionStatus] = useState<string | null>(null);
   const [audioLevel, setAudioLevel] = useState<number[]>(Array(12).fill(10));
+  const [showTipOverlay, setShowTipOverlay] = useState(true);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -181,7 +186,85 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-6 flex flex-col items-center">
+        <div className="p-6 space-y-5 flex flex-col items-center max-h-[82vh] overflow-y-auto custom-scrollbar">
+          
+          {/* Subtle Voice Command Tip Overlay */}
+          <div className="w-full rounded-2xl bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-cyan-500/10 border border-amber-500/20 p-3.5 backdrop-blur-md transition-all">
+            <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowTipOverlay(!showTipOverlay)}>
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <Lightbulb className="w-4 h-4 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-slate-100 flex items-center gap-2">
+                    <span>Voice Command Tips & Hints</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 font-mono">
+                      Syntax Guide
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-300">
+                    {showTipOverlay ? 'Click any tip chip below to test or speak it out loud:' : 'Click to show supported speech syntax...'}
+                  </p>
+                </div>
+              </div>
+
+              <button className="p-1 text-slate-400 hover:text-white transition-colors">
+                {showTipOverlay ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {showTipOverlay && (
+              <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs animate-in fade-in duration-200">
+                <div 
+                  onClick={() => handleProcessCommand('Create a new feature request card')}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
+                >
+                  <span className="font-mono text-indigo-300 text-[11px]">"Create [title] card"</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-amber-300">Try it →</span>
+                </div>
+
+                <div 
+                  onClick={() => handleProcessCommand('Move task card to completed')}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
+                >
+                  <span className="font-mono text-emerald-300 text-[11px]">"Move card to [status]"</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-amber-300">Try it →</span>
+                </div>
+
+                <div 
+                  onClick={() => handleProcessCommand('Open telemetry analytics dashboard')}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
+                >
+                  <span className="font-mono text-cyan-300 text-[11px]">"Open analytics"</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-amber-300">Try it →</span>
+                </div>
+
+                <div 
+                  onClick={() => handleProcessCommand('Open global search modal')}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
+                >
+                  <span className="font-mono text-purple-300 text-[11px]">"Open search"</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-amber-300">Try it →</span>
+                </div>
+
+                <div 
+                  onClick={() => handleProcessCommand('Run auto archive inactive completed cards')}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
+                >
+                  <span className="font-mono text-rose-300 text-[11px]">"Run auto archive"</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-amber-300">Try it →</span>
+                </div>
+
+                <div 
+                  onClick={() => handleProcessCommand('Open board template library')}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
+                >
+                  <span className="font-mono text-amber-300 text-[11px]">"Open template library"</span>
+                  <span className="text-[10px] text-slate-400 group-hover:text-amber-300">Try it →</span>
+                </div>
+              </div>
+            )}
+          </div>
           
           {/* Main Mic Pulse Circle */}
           <div className="relative flex flex-col items-center justify-center py-4">

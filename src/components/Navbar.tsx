@@ -22,6 +22,7 @@ import {
   ZoomOut, 
   RotateCcw,
   Tag,
+  BookmarkPlus,
   X
 } from 'lucide-react';
 import { BoardData, RBACRole } from '../types';
@@ -36,6 +37,7 @@ interface NavbarProps {
   onOpenNewBoard: () => void;
   onOpenSearch: () => void;
   onOpenTemplates: () => void;
+  onOpenSaveTemplate?: () => void;
   onOpenVoice?: () => void;
   onOpenAnalytics?: () => void;
   onOpenOverviewMap?: () => void;
@@ -68,6 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenNewBoard,
   onOpenSearch,
   onOpenTemplates,
+  onOpenSaveTemplate,
   onOpenVoice,
   onOpenAnalytics,
   onOpenOverviewMap,
@@ -159,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   )}
                 </button>
               ))}
-              <div className="border-t border-white/10 mt-1 pt-1 px-1">
+              <div className="border-t border-white/10 mt-1 pt-1 px-1 space-y-0.5">
                 <button
                   onClick={() => {
                     onOpenNewBoard();
@@ -171,6 +174,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <Plus className="w-3.5 h-3.5" />
                   <span>New Board</span>
                 </button>
+
+                {onOpenSaveTemplate && (
+                  <button
+                    onClick={() => {
+                      onOpenSaveTemplate();
+                      setDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 text-xs text-cyan-300 hover:bg-cyan-500/20 rounded-lg flex items-center gap-2"
+                    title="Save active board as a reusable template"
+                  >
+                    <BookmarkPlus className="w-3.5 h-3.5" />
+                    <span>Save Board as Template</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -193,10 +210,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onAddList && (
           <button
             onClick={onAddList}
-            className="p-2 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 transition-all shadow-sm"
+            className="group flex items-center p-2 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 transition-all duration-300 shadow-sm"
             title="Add New Column / List to Canvas"
           >
-            <ListPlus className="w-4 h-4 text-indigo-300" />
+            <ListPlus className="w-4 h-4 text-indigo-300 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Add List
+            </span>
           </button>
         )}
 
@@ -204,14 +224,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onToggleHeatmap && (
           <button
             onClick={onToggleHeatmap}
-            className={`p-2 rounded-lg border transition-all ${
+            className={`group flex items-center p-2 rounded-lg border transition-all duration-300 ${
               isHeatmapActive
                 ? 'bg-rose-500/30 border-rose-500/60 text-rose-200 shadow-md shadow-rose-500/20'
                 : 'bg-white/10 hover:bg-rose-500/20 border-white/10 text-slate-300 hover:text-white'
             }`}
             title="Toggle Velocity Heatmap Layer"
           >
-            <Flame className={`w-4 h-4 ${isHeatmapActive ? 'text-rose-400 animate-bounce' : 'text-slate-400'}`} />
+            <Flame className={`w-4 h-4 shrink-0 ${isHeatmapActive ? 'text-rose-400 animate-bounce' : 'text-slate-400'}`} />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              {isHeatmapActive ? 'Heatmap On' : 'Heatmap'}
+            </span>
           </button>
         )}
 
@@ -219,43 +242,55 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onToggleSmartFilter && (
           <button
             onClick={onToggleSmartFilter}
-            className={`p-2 rounded-lg border transition-all ${
+            className={`group flex items-center p-2 rounded-lg border transition-all duration-300 ${
               smartFilterActive
                 ? 'bg-amber-500/30 border-amber-500/60 text-amber-200 shadow-md shadow-amber-500/20'
                 : 'bg-white/10 hover:bg-white/20 border-white/10 text-slate-300 hover:text-white'
             }`}
             title="Smart Filter: Collapse Inactive Lists"
           >
-            <Filter className={`w-4 h-4 ${smartFilterActive ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
+            <Filter className={`w-4 h-4 shrink-0 ${smartFilterActive ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              {smartFilterActive ? 'Smart Filter On' : 'Smart Filter'}
+            </span>
           </button>
         )}
 
         {/* AI Orchestrator Trigger */}
         <button
           onClick={onOpenOrchestrator}
-          className="p-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border border-white/20 text-white shadow-md shadow-indigo-600/30 transition-all"
+          className="group flex items-center p-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border border-white/20 text-white shadow-md shadow-indigo-600/30 transition-all duration-300"
           title="AI Orchestrator Routine Engine (Gemini)"
         >
-          <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
+          <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow shrink-0" />
+          <span className="max-w-0 opacity-0 group-hover:max-w-36 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+            AI Orchestrator
+          </span>
         </button>
 
         {/* Board Router / Interconnect Trigger */}
         <button
           onClick={onOpenInterconnect}
-          className="p-2 rounded-lg bg-white/10 hover:bg-purple-500/20 border border-white/10 text-slate-300 hover:text-purple-300 transition-colors"
+          className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-purple-500/20 border border-white/10 text-slate-300 hover:text-purple-300 transition-all duration-300"
           title="Board Interconnectivity & Feed-Forward Router"
         >
-          <GitFork className="w-4 h-4 text-purple-400" />
+          <GitFork className="w-4 h-4 text-purple-400 shrink-0" />
+          <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+            Interconnect
+          </span>
         </button>
 
         {/* Overview Map & Dependency Graph */}
         {onOpenOverviewMap && (
           <button
             onClick={onOpenOverviewMap}
-            className="p-2 rounded-lg bg-white/10 hover:bg-indigo-500/20 border border-white/10 text-slate-300 hover:text-indigo-300 transition-colors"
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-indigo-500/20 border border-white/10 text-slate-300 hover:text-indigo-300 transition-all duration-300"
             title="Overview Map & Dependency Graph"
           >
-            <Network className="w-4 h-4 text-indigo-400" />
+            <Network className="w-4 h-4 text-indigo-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Overview Map
+            </span>
           </button>
         )}
 
@@ -263,10 +298,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenVoice && (
           <button
             onClick={onOpenVoice}
-            className="p-2 rounded-lg bg-white/10 hover:bg-rose-500/20 border border-white/10 text-slate-300 hover:text-rose-300 transition-colors"
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-rose-500/20 border border-white/10 text-slate-300 hover:text-rose-300 transition-all duration-300"
             title="Voice-to-Action Listener"
           >
-            <Mic className="w-4 h-4 text-rose-400" />
+            <Mic className="w-4 h-4 text-rose-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Voice Assistant
+            </span>
           </button>
         )}
 
@@ -274,10 +312,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenAnalytics && (
           <button
             onClick={onOpenAnalytics}
-            className="p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 border border-white/10 text-slate-300 hover:text-cyan-300 transition-colors"
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 border border-white/10 text-slate-300 hover:text-cyan-300 transition-all duration-300"
             title="Analytics Telemetry Dashboard"
           >
-            <BarChart3 className="w-4 h-4 text-cyan-400" />
+            <BarChart3 className="w-4 h-4 text-cyan-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Analytics
+            </span>
           </button>
         )}
 
@@ -285,10 +326,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenThemeModal && (
           <button
             onClick={onOpenThemeModal}
-            className="p-2 rounded-lg bg-white/10 hover:bg-purple-500/20 border border-white/10 text-slate-300 hover:text-purple-300 transition-colors"
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-purple-500/20 border border-white/10 text-slate-300 hover:text-purple-300 transition-all duration-300"
             title="Change Board Theme & Background Canvas"
           >
-            <Palette className="w-4 h-4 text-purple-400" />
+            <Palette className="w-4 h-4 text-purple-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Board Theme
+            </span>
           </button>
         )}
 
@@ -296,47 +340,73 @@ export const Navbar: React.FC<NavbarProps> = ({
         {onOpenAutoArchiveModal && (
           <button
             onClick={onOpenAutoArchiveModal}
-            className="p-2 rounded-lg bg-white/10 hover:bg-amber-500/20 border border-white/10 text-slate-300 hover:text-amber-300 transition-colors"
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-amber-500/20 border border-white/10 text-slate-300 hover:text-amber-300 transition-all duration-300"
             title="Auto-Archive Routine Rules"
           >
-            <Archive className="w-4 h-4 text-amber-400" />
+            <Archive className="w-4 h-4 text-amber-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Auto-Archive
+            </span>
           </button>
         )}
 
         {/* Templates Library */}
         <button
           onClick={onOpenTemplates}
-          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 hover:text-white transition-colors"
+          className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 hover:text-white transition-all duration-300"
           title="Board Template Library"
         >
-          <Layout className="w-4 h-4 text-indigo-400" />
+          <Layout className="w-4 h-4 text-indigo-400 shrink-0" />
+          <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+            Templates
+          </span>
         </button>
+
+        {/* Save as Template Tool */}
+        {onOpenSaveTemplate && (
+          <button
+            onClick={onOpenSaveTemplate}
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-cyan-500/20 border border-white/10 text-slate-300 hover:text-cyan-300 transition-all duration-300"
+            title="Save Active Board Layout as Custom Template"
+          >
+            <BookmarkPlus className="w-4 h-4 text-cyan-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-36 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Save Template
+            </span>
+          </button>
+        )}
 
         {/* Export High-Res Board Snapshot */}
         {onExportBoardImage && (
           <button
             onClick={onExportBoardImage}
-            className="p-2 rounded-lg bg-white/10 hover:bg-emerald-500/20 border border-white/10 text-slate-300 hover:text-emerald-300 transition-colors"
+            className="group flex items-center p-2 rounded-lg bg-white/10 hover:bg-emerald-500/20 border border-white/10 text-slate-300 hover:text-emerald-300 transition-all duration-300"
             title="Export High-Resolution Board Image"
           >
-            <Download className="w-4 h-4 text-emerald-400" />
+            <Download className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+              Export Image
+            </span>
           </button>
         )}
 
         {/* Tag / Hashtag Filter Modal Trigger Button */}
         <button
           onClick={onOpenTagManagerModal}
-          className={`p-2 rounded-lg border transition-all relative ${
+          className={`group flex items-center p-2 rounded-lg border transition-all duration-300 relative ${
             selectedTagFilter
               ? 'bg-indigo-600/30 border-indigo-500/60 text-indigo-200 shadow-md shadow-indigo-500/20 ring-1 ring-indigo-500/50'
               : 'bg-white/10 hover:bg-indigo-500/20 border-white/10 text-slate-300 hover:text-indigo-300'
           }`}
           title={selectedTagFilter ? `Active Tag Filter: #${selectedTagFilter}. Click to manage tags & filters.` : "Filter & Manage Hashtag Tags"}
         >
-          <Tag className={`w-4 h-4 ${selectedTagFilter ? 'text-indigo-300' : 'text-indigo-400'}`} />
+          <Tag className={`w-4 h-4 shrink-0 ${selectedTagFilter ? 'text-indigo-300' : 'text-indigo-400'}`} />
           {selectedTagFilter && (
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse border border-slate-900" />
           )}
+          <span className="max-w-0 opacity-0 group-hover:max-w-32 group-hover:opacity-100 group-hover:ml-1.5 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden text-xs font-semibold">
+            {selectedTagFilter ? `#${selectedTagFilter}` : 'Filter Tags'}
+          </span>
         </button>
       </div>
 

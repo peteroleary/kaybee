@@ -15,6 +15,7 @@ import { ThemeSelectorModal } from './components/ThemeSelectorModal';
 import { AutoArchiveModal } from './components/AutoArchiveModal';
 import { OverviewMapModal } from './components/OverviewMapModal';
 import { TagManagerModal } from './components/TagManagerModal';
+import { SaveTemplateModal } from './components/SaveTemplateModal';
 import { toPng } from 'html-to-image';
 import { INITIAL_BOARDS } from './data/initialData';
 import { BOARD_TEMPLATES, BoardTemplate } from './data/templates';
@@ -41,6 +42,26 @@ export default function App() {
   const [autoArchiveModalOpen, setAutoArchiveModalOpen] = useState(false);
   const [overviewMapOpen, setOverviewMapOpen] = useState(false);
   const [tagManagerModalOpen, setTagManagerModalOpen] = useState(false);
+  const [saveTemplateModalOpen, setSaveTemplateModalOpen] = useState(false);
+  const [customTemplates, setCustomTemplates] = useState<BoardTemplate[]>(() => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('evo_kanban_custom_templates') : null;
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleSaveTemplate = (newTemplate: BoardTemplate) => {
+    setCustomTemplates(prev => {
+      const updated = [newTemplate, ...prev];
+      try {
+        localStorage.setItem('evo_kanban_custom_templates', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    logActivity(`Saved current board snapshot as custom template: "${newTemplate.name}"`);
+  };
   const [customTagColors, setCustomTagColors] = useState<Record<string, string>>(() => {
     try {
       const saved = typeof window !== 'undefined' ? localStorage.getItem('kb3_custom_tag_colors') : null;
@@ -639,6 +660,26 @@ export default function App() {
     logActivity(`Updated list config: "${updatedList.title}"`);
   };
 
+  // Toggle 2-column grid layout for list
+  const handleToggleTwoColumns = (listId: string) => {
+    setBoards(prev =>
+      prev.map(b => b.id === activeBoardId ? {
+        ...b,
+        lists: b.lists.map(l => l.id === listId ? { ...l, isTwoColumns: !l.isTwoColumns } : l)
+      } : b)
+    );
+  };
+
+  // Resize column width
+  const handleResizeListWidth = (listId: string, width: number) => {
+    setBoards(prev =>
+      prev.map(b => b.id === activeBoardId ? {
+        ...b,
+        lists: b.lists.map(l => l.id === listId ? { ...l, width } : l)
+      } : b)
+    );
+  };
+
   // Update Card detail
   const handleUpdateCard = (updatedCard: CardItemData) => {
     setBoards(prev =>
@@ -866,6 +907,7 @@ export default function App() {
           onOpenNewBoard={() => setNewBoardModalOpen(true)}
           onOpenSearch={() => setSearchModalOpen(true)}
           onOpenTemplates={() => setBoardTemplateModalOpen(true)}
+          onOpenSaveTemplate={() => setSaveTemplateModalOpen(true)}
           onOpenVoice={() => setVoiceModalOpen(true)}
           onOpenAnalytics={() => setAnalyticsModalOpen(true)}
           onOpenOverviewMap={() => setOverviewMapOpen(true)}
@@ -895,6 +937,8 @@ export default function App() {
           onUpdateCardWidget={handleUpdateCardWidget}
           onOpenCardDetail={(card) => setSelectedCard(card)}
           onRunAgentTask={handleRunAgentTask}
+          onToggleTwoColumns={handleToggleTwoColumns}
+          onResizeListWidth={handleResizeListWidth}
           onAddCard={handleAddCard}
           onSendChatMessage={handleSendChatMessage}
           onOpenListSettings={(list) => setSelectedList(list)}
@@ -915,25 +959,7 @@ export default function App() {
           onUpdateCard={handleUpdateCard}
         />
 
-        {/* Section 3: Sleek Minimal Status Footer */}
-        <footer className="h-6 bg-slate-950/90 border-t border-white/10 px-4 flex items-center justify-between text-[10px] font-mono text-slate-400 shrink-0 z-30 select-none">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 text-slate-300 font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{activeBoard.name}</span>
-            </span>
-            <span className="text-white/20">|</span>
-            <span>{activeBoard.lists.reduce((acc, l) => acc + l.cards.length, 0)} total cards across {activeBoard.lists.length} lists</span>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <span className="uppercase text-indigo-400 font-semibold">{currentRole} role active</span>
-            <span className="text-white/20">|</span>
-            <span>Canvas Zoom: {Math.round(zoomLevel * 100)}%</span>
-            <span className="text-white/20">|</span>
-            <span className="text-cyan-400">Gemini Orchestrator Ready</span>
-          </div>
-        </footer>
       </div>
 
       {/* AI Orchestrator Agent Modal */}
@@ -950,6 +976,17 @@ export default function App() {
         isOpen={boardTemplateModalOpen}
         onClose={() => setBoardTemplateModalOpen(false)}
         onSelectTemplate={handleSelectBoardTemplate}
+        activeBoardName={activeBoard.name}
+        customTemplates={customTemplates}
+        onOpenSaveTemplateModal={() => setSaveTemplateModalOpen(true)}
+      />
+
+      {/* Save Active Board as Template Modal */}
+      <SaveTemplateModal
+        isOpen={saveTemplateModalOpen}
+        onClose={() => setSaveTemplateModalOpen(false)}
+        activeBoard={activeBoard}
+        onSaveTemplate={handleSaveTemplate}
       />
 
       {/* Template-based Card Creation Modal */}

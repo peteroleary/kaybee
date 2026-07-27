@@ -27,6 +27,8 @@ interface BoardCanvasProps {
   onUpdateCardWidget: (cardId: string, widgetId: string, newValue: any) => void;
   onOpenCardDetail: (card: CardItemData) => void;
   onRunAgentTask: (card: CardItemData) => void;
+  onToggleTwoColumns?: (listId: string) => void;
+  onResizeListWidth?: (listId: string, width: number) => void;
   onAddCard: (listId: string) => void;
   onSendChatMessage: (listId: string, messageText: string) => void;
   onOpenListSettings: (list: ListConfig) => void;
@@ -52,6 +54,8 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
   onUpdateCardWidget,
   onOpenCardDetail,
   onRunAgentTask,
+  onToggleTwoColumns,
+  onResizeListWidth,
   onAddCard,
   onSendChatMessage,
   onOpenListSettings,
@@ -235,6 +239,8 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
                   onOpenListSettings={onOpenListSettings}
                   onDeleteList={onDeleteList}
                   onDeleteCard={onDeleteCard}
+                  onToggleTwoColumns={onToggleTwoColumns}
+                  onResizeListWidth={onResizeListWidth}
                   onMoveCard={handleGuardedMoveCard}
                   onTagClick={(tag) => onSelectTagFilter ? onSelectTagFilter(tag) : setInternalTagFilter(tag)}
                   currentRole={currentRole}
@@ -257,27 +263,21 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
         </div>
       </div>
 
-      {/* Bottom Minimap & Canvas Navigator Bar */}
-      <div className="p-3 bg-black/30 backdrop-blur-md border-t border-white/10 flex items-center justify-between text-xs text-slate-300">
-        <div className="flex items-center gap-2 overflow-x-auto py-1 max-w-2xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Lists Navigator:</span>
+      {/* Lists Navigator Bottom Bar */}
+      <div className="px-4 py-2 bg-black/40 backdrop-blur-md border-t border-white/10 flex items-center text-xs text-slate-300">
+        <div className="flex items-center gap-2 overflow-x-auto py-0.5 w-full custom-scrollbar">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">Lists Navigator:</span>
           {board.lists.map((l, idx) => (
             <button
               key={l.id}
               onClick={() => scrollToList(idx)}
-              className="px-3 py-1 rounded-xl bg-white/10 hover:bg-indigo-600/30 hover:border-indigo-400/40 border border-white/10 backdrop-blur-md text-slate-200 font-medium whitespace-nowrap transition-all flex items-center gap-1.5 shadow-sm"
+              className="px-3 py-1 rounded-xl bg-white/10 hover:bg-indigo-600/30 hover:border-indigo-400/40 border border-white/10 backdrop-blur-md text-slate-200 font-medium whitespace-nowrap transition-all flex items-center gap-1.5 shadow-sm shrink-0"
             >
               <span className="w-2 h-2 rounded-full bg-indigo-400" />
               <span>{l.title}</span>
               <span className="text-[10px] text-slate-400 font-mono">({l.cards.length})</span>
             </button>
           ))}
-        </div>
-
-        <div className="flex items-center gap-3 font-mono text-[11px] text-slate-400">
-          <span>Board: {board.name}</span>
-          <span>•</span>
-          <span>Theme: {activeTheme.name}</span>
         </div>
       </div>
     </div>

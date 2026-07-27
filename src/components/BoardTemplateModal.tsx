@@ -15,7 +15,8 @@ import {
   Users,
   MessageSquare,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  BookmarkPlus
 } from 'lucide-react';
 import { 
   BOARD_TEMPLATES, 
@@ -32,6 +33,8 @@ interface BoardTemplateModalProps {
   onClose: () => void;
   onSelectTemplate: (template: BoardTemplate, mode: 'create_new' | 'apply_current') => void;
   activeBoardName: string;
+  customTemplates?: BoardTemplate[];
+  onOpenSaveTemplateModal?: () => void;
 }
 
 type TemplateTab = 'boards' | 'agents' | 'cards' | 'workflows' | 'routines';
@@ -40,10 +43,13 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
   isOpen,
   onClose,
   onSelectTemplate,
-  activeBoardName
+  activeBoardName,
+  customTemplates = [],
+  onOpenSaveTemplateModal
 }) => {
   const [activeTab, setActiveTab] = useState<TemplateTab>('boards');
-  const [selectedTemplate, setSelectedTemplate] = useState<BoardTemplate>(BOARD_TEMPLATES[0]);
+  const allBoardTemplates = [...customTemplates, ...BOARD_TEMPLATES];
+  const [selectedTemplate, setSelectedTemplate] = useState<BoardTemplate>(allBoardTemplates[0] || BOARD_TEMPLATES[0]);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
@@ -51,7 +57,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
 
   const categories = ['all', 'Core Engineering', 'Agent Swarms', 'Human Operations'];
 
-  const filteredBoardTemplates = BOARD_TEMPLATES.filter(tpl => {
+  const filteredBoardTemplates = allBoardTemplates.filter(tpl => {
     const matchesSearch = tpl.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           tpl.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           tpl.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -232,12 +238,28 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
               </p>
             </div>
           </div>
-          <button 
-            onClick={onClose} 
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onOpenSaveTemplateModal && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenSaveTemplateModal();
+                }}
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-indigo-500/20 border border-white/10 transition-all"
+                title="Save current board state as a new reusable template"
+              >
+                <BookmarkPlus className="w-4 h-4 text-indigo-200" />
+                <span className="hidden sm:inline">Save Board as Template</span>
+              </button>
+            )}
+
+            <button 
+              onClick={onClose} 
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation Bar */}

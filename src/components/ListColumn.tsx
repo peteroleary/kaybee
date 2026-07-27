@@ -33,6 +33,7 @@ interface ListColumnProps {
   onDeleteList?: (listId: string) => void;
   onDeleteCard?: (cardId: string, listId?: string) => void;
   onToggleTwoColumns?: (listId: string) => void;
+  onResizeListWidth?: (listId: string, width: number) => void;
   onMoveCard?: (cardId: string, sourceListId: string, targetListId: string) => void;
   onTagClick?: (tag: string) => void;
   currentRole: RBACRole;
@@ -50,6 +51,7 @@ export const ListColumn: React.FC<ListColumnProps> = ({
   onDeleteList,
   onDeleteCard,
   onToggleTwoColumns,
+  onResizeListWidth,
   onMoveCard,
   onTagClick,
   currentRole,
@@ -58,8 +60,43 @@ export const ListColumn: React.FC<ListColumnProps> = ({
   const [chatText, setChatText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [currentWidth, setCurrentWidth] = useState<number | undefined>(list.width);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+
+  // Keep local width state synchronized if list.width or isTwoColumns changes externally
+  React.useEffect(() => {
+    if (list.width !== undefined) {
+      setCurrentWidth(list.width);
+    }
+  }, [list.width, list.isTwoColumns]);
+
+  const handleMouseDownResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    const startX = e.clientX;
+    const initialWidth = currentWidth || (list.isTwoColumns ? 540 : 384);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(280, Math.min(800, initialWidth + deltaX));
+      setCurrentWidth(newWidth);
+      if (onResizeListWidth) {
+        onResizeListWidth(list.id, newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
 
   const PRIORITY_SCORES: Record<string, number> = {
     urgent: 4,
@@ -149,6 +186,7 @@ export const ListColumn: React.FC<ListColumnProps> = ({
 
   return (
     <div 
+      style={{ width: currentWidth ? `${currentWidth}px` : undefined }}
       onDragOver={(e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
@@ -172,10 +210,25 @@ export const ListColumn: React.FC<ListColumnProps> = ({
           console.error('Drop error:', err);
         }
       }}
-      className={`flex-shrink-0 ${list.isTwoColumns ? 'w-80 md:w-[540px]' : 'w-80 md:w-96'} flex flex-col h-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl overflow-hidden select-none ring-1 ring-white/5 transition-all duration-300 ${
+      className={`relative flex-shrink-0 ${!currentWidth ? (list.isTwoColumns ? 'w-80 md:w-[540px]' : 'w-80 md:w-96') : ''} flex flex-col h-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl overflow-hidden select-none ring-1 ring-white/5 transition-all ${
+        isResizing ? 'ring-2 ring-indigo-500/80 shadow-indigo-500/20' : ''
+      } ${
         isDragOver ? 'border-2 border-dashed border-indigo-400 bg-indigo-500/10 scale-[1.01] shadow-2xl ring-2 ring-indigo-500/40' : ''
       }`}
     >
+      {/* Right Edge Column Resize Handle */}
+      <div
+        onMouseDown={handleMouseDownResize}
+        onDoubleClick={() => {
+          const resetWidth = list.isTwoColumns ? 540 : 384;
+          setCurrentWidth(resetWidth);
+          if (onResizeListWidth) onResizeListWidth(list.id, resetWidth);
+        }}
+        className="absolute top-0 right-0 bottom-0 w-3 cursor-col-resize hover:bg-indigo-500/30 group/resize z-30 transition-all flex items-center justify-center select-none"
+        title="Drag to resize column width (Double-click to reset)"
+      >
+        <div className={`w-1 h-12 rounded-full transition-all ${isResizing ? 'bg-indigo-400 shadow-lg shadow-indigo-500/50 scale-y-125' : 'bg-white/10 group-hover/resize:bg-indigo-300'}`} />
+      </div>
       {/* Header */}
       <div className="p-3.5 border-b border-white/10 bg-white/5 flex flex-col gap-2 backdrop-blur-sm">
         <div className="flex items-center justify-between gap-2">
