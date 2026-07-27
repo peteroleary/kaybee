@@ -14,6 +14,7 @@ import { VoiceActionModal } from './components/VoiceActionModal';
 import { ThemeSelectorModal } from './components/ThemeSelectorModal';
 import { AutoArchiveModal } from './components/AutoArchiveModal';
 import { OverviewMapModal } from './components/OverviewMapModal';
+import { TagManagerModal } from './components/TagManagerModal';
 import { toPng } from 'html-to-image';
 import { INITIAL_BOARDS } from './data/initialData';
 import { BOARD_TEMPLATES, BoardTemplate } from './data/templates';
@@ -39,8 +40,89 @@ export default function App() {
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   const [autoArchiveModalOpen, setAutoArchiveModalOpen] = useState(false);
   const [overviewMapOpen, setOverviewMapOpen] = useState(false);
+  const [tagManagerModalOpen, setTagManagerModalOpen] = useState(false);
+  const [customTagColors, setCustomTagColors] = useState<Record<string, string>>(() => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('kb3_custom_tag_colors') : null;
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [smartFilterActive, setSmartFilterActive] = useState(false);
   const [isHeatmapActive, setIsHeatmapActive] = useState(false);
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+
+  const handleRenameTag = (oldTag: string, newTag: string) => {
+    const oldNorm = oldTag.trim().toLowerCase();
+    const newNorm = newTag.trim().toLowerCase();
+    if (!newNorm || oldNorm === newNorm) return;
+
+    setBoards(prevBoards => 
+      prevBoards.map(board => ({
+        ...board,
+        lists: board.lists.map(list => ({
+          ...list,
+          cards: list.cards.map(card => {
+            if (!card.tags || card.tags.length === 0) return card;
+            const updatedTags = card.tags.map(t => 
+              t.trim().toLowerCase() === oldNorm ? newTag.trim() : t
+            );
+            return { ...card, tags: updatedTags };
+          })
+        }))
+      }))
+    );
+
+    if (selectedTagFilter?.trim().toLowerCase() === oldNorm) {
+      setSelectedTagFilter(newTag.trim());
+    }
+
+    if (customTagColors[oldNorm]) {
+      setCustomTagColors(prev => {
+        const next = { ...prev };
+        next[newNorm] = next[oldNorm];
+        delete next[oldNorm];
+        try { localStorage.setItem('kb3_custom_tag_colors', JSON.stringify(next)); } catch {}
+        return next;
+      });
+    }
+
+    logActivity(`Renamed tag #${oldTag} to #${newTag} globally across all boards`);
+  };
+
+  const handleDeleteTag = (tagToDelete: string) => {
+    const norm = tagToDelete.trim().toLowerCase();
+    setBoards(prevBoards => 
+      prevBoards.map(board => ({
+        ...board,
+        lists: board.lists.map(list => ({
+          ...list,
+          cards: list.cards.map(card => {
+            if (!card.tags || card.tags.length === 0) return card;
+            const updatedTags = card.tags.filter(t => t.trim().toLowerCase() !== norm);
+            return { ...card, tags: updatedTags };
+          })
+        }))
+      }))
+    );
+
+    if (selectedTagFilter?.trim().toLowerCase() === norm) {
+      setSelectedTagFilter(null);
+    }
+
+    logActivity(`Deleted tag #${tagToDelete} globally across all boards`);
+  };
+
+  const handleUpdateTagColor = (tag: string, colorKey: string) => {
+    const norm = tag.trim().toLowerCase();
+    setCustomTagColors(prev => {
+      const next = { ...prev, [norm]: colorKey };
+      try { localStorage.setItem('kb3_custom_tag_colors', JSON.stringify(next)); } catch {}
+      return next;
+    });
+    logActivity(`Updated palette for tag #${tag}`);
+  };
   const [selectedCard, setSelectedCard] = useState<CardItemData | null>(null);
   const [selectedList, setSelectedList] = useState<ListConfig | null>(null);
   const [newBoardModalOpen, setNewBoardModalOpen] = useState(false);
@@ -795,6 +877,9 @@ export default function App() {
           onOpenThemeModal={() => setThemeModalOpen(true)}
           onOpenAutoArchiveModal={() => setAutoArchiveModalOpen(true)}
           onAddList={() => handleAddList('right')}
+          selectedTagFilter={selectedTagFilter}
+          onSelectTagFilter={(tag) => setSelectedTagFilter(tag)}
+          onOpenTagManagerModal={() => setTagManagerModalOpen(true)}
           currentRole={currentRole}
           onChangeRole={(role) => setCurrentRole(role)}
           zoomLevel={zoomLevel}
@@ -823,6 +908,8 @@ export default function App() {
           onOpenAutoArchiveModal={() => setAutoArchiveModalOpen(true)}
           smartFilterActive={smartFilterActive}
           isHeatmapActive={isHeatmapActive}
+          selectedTagFilter={selectedTagFilter}
+          onSelectTagFilter={(tag) => setSelectedTagFilter(tag)}
           currentRole={currentRole}
           zoomLevel={zoomLevel}
           onUpdateCard={handleUpdateCard}
@@ -924,6 +1011,19 @@ export default function App() {
           setSelectedCard(card);
           setOverviewMapOpen(false);
         }}
+      />
+
+      {/* Global Tag Manager & Hashtag Filters Modal */}
+      <TagManagerModal
+        isOpen={tagManagerModalOpen}
+        onClose={() => setTagManagerModalOpen(false)}
+        boards={boards}
+        selectedTagFilter={selectedTagFilter}
+        onSelectTagFilter={(tag) => setSelectedTagFilter(tag)}
+        onRenameTag={handleRenameTag}
+        onDeleteTag={handleDeleteTag}
+        customTagColors={customTagColors}
+        onUpdateTagColor={handleUpdateTagColor}
       />
 
       {/* Card Detail Modal */}

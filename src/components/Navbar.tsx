@@ -20,9 +20,12 @@ import {
   GitFork, 
   ZoomIn, 
   ZoomOut, 
-  RotateCcw
+  RotateCcw,
+  Tag,
+  X
 } from 'lucide-react';
 import { BoardData, RBACRole } from '../types';
+import { getTagStyle } from '../data/tagsAndThemes';
 
 interface NavbarProps {
   boards: BoardData[];
@@ -44,6 +47,9 @@ interface NavbarProps {
   onOpenThemeModal?: () => void;
   onOpenAutoArchiveModal?: () => void;
   onAddList?: () => void;
+  selectedTagFilter?: string | null;
+  onSelectTagFilter?: (tag: string | null) => void;
+  onOpenTagManagerModal?: () => void;
   currentRole: RBACRole;
   onChangeRole: (role: RBACRole) => void;
   zoomLevel: number;
@@ -73,6 +79,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenThemeModal,
   onOpenAutoArchiveModal,
   onAddList,
+  selectedTagFilter,
+  onSelectTagFilter,
+  onOpenTagManagerModal,
   currentRole,
   onChangeRole,
   zoomLevel,
@@ -83,8 +92,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
 
   const activeBoard = boards.find(b => b.id === activeBoardId) || boards[0];
+
+  // Extract all unique tags across cards on active board
+  const allBoardTagsSet = new Set<string>();
+  activeBoard.lists.forEach(l => {
+    l.cards.forEach(c => {
+      c.tags?.forEach(t => allBoardTagsSet.add(t));
+    });
+  });
+  const allBoardTags = Array.from(allBoardTagsSet);
 
   const roleColors: Record<RBACRole, string> = {
     admin: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
@@ -303,6 +322,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Download className="w-4 h-4 text-emerald-400" />
           </button>
         )}
+
+        {/* Tag / Hashtag Filter Modal Trigger Button */}
+        <button
+          onClick={onOpenTagManagerModal}
+          className={`p-2 rounded-lg border transition-all relative ${
+            selectedTagFilter
+              ? 'bg-indigo-600/30 border-indigo-500/60 text-indigo-200 shadow-md shadow-indigo-500/20 ring-1 ring-indigo-500/50'
+              : 'bg-white/10 hover:bg-indigo-500/20 border-white/10 text-slate-300 hover:text-indigo-300'
+          }`}
+          title={selectedTagFilter ? `Active Tag Filter: #${selectedTagFilter}. Click to manage tags & filters.` : "Filter & Manage Hashtag Tags"}
+        >
+          <Tag className={`w-4 h-4 ${selectedTagFilter ? 'text-indigo-300' : 'text-indigo-400'}`} />
+          {selectedTagFilter && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse border border-slate-900" />
+          )}
+        </button>
       </div>
 
       {/* Right Group: Zoom Controls, RBAC Role Selector & Activity Feed */}
