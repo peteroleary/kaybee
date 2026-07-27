@@ -23,10 +23,15 @@ import {
   RotateCcw,
   Tag,
   BookmarkPlus,
-  X
+  X,
+  LogIn,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
 import { BoardData, RBACRole } from '../types';
 import { getTagStyle } from '../data/tagsAndThemes';
+import { useAuth } from '../context/AuthContext';
+
 
 interface NavbarProps {
   boards: BoardData[];
@@ -96,6 +101,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
+  const { user, signInWithGoogle, signOutUser } = useAuth();
+
 
   const activeBoard = boards.find(b => b.id === activeBoardId) || boards[0];
 
@@ -446,7 +453,45 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           )}
         </button>
+
+        {/* Firebase Authentication Widget */}
+        {user ? (
+          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
+            {user.photoURL ? (
+              <img 
+                src={user.photoURL} 
+                alt={user.displayName || 'User'} 
+                className="w-6 h-6 rounded-full border border-indigo-500/50"
+                title={user.email || user.displayName || 'Firebase Authenticated User'}
+              />
+            ) : (
+              <div 
+                className="w-6 h-6 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-300"
+                title={user.email || 'Firebase Authenticated User'}
+              >
+                <UserIcon className="w-3 h-3" />
+              </div>
+            )}
+            <button
+              onClick={() => signOutUser()}
+              className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-rose-500/20 border border-slate-700/60 hover:border-rose-500/40 text-slate-400 hover:text-rose-300 transition-colors"
+              title="Sign Out (Firebase Auth)"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => signInWithGoogle()}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 text-xs font-medium transition-colors"
+            title="Sign in with Google (Firebase Auth)"
+          >
+            <LogIn className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden sm:inline">Sign In</span>
+          </button>
+        )}
       </div>
+
 
     </header>
   );
