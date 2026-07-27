@@ -64,6 +64,7 @@ export const ListColumn: React.FC<ListColumnProps> = ({
   const [currentWidth, setCurrentWidth] = useState<number | undefined>(list.width);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   // Keep local width state synchronized if list.width or isTwoColumns changes externally
   React.useEffect(() => {
@@ -71,6 +72,13 @@ export const ListColumn: React.FC<ListColumnProps> = ({
       setCurrentWidth(list.width);
     }
   }, [list.width, list.isTwoColumns]);
+
+  // Auto-scroll chat feed to bottom when new cards or messages are added
+  React.useEffect(() => {
+    if (list.listType === 'chat_feed' && cardsContainerRef.current) {
+      cardsContainerRef.current.scrollTop = cardsContainerRef.current.scrollHeight;
+    }
+  }, [list.cards.length, list.listType]);
 
   const handleMouseDownResize = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -233,20 +241,12 @@ export const ListColumn: React.FC<ListColumnProps> = ({
       <div className="p-3 border-b border-slate-800 bg-slate-900 flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="p-1 rounded-md bg-slate-800 border border-slate-700/60 text-slate-300">
-              <BadgeIcon className="w-3.5 h-3.5 text-indigo-400" />
-            </span>
             <h3 className="text-xs font-bold text-slate-200 truncate">
               {list.title}
             </h3>
-            <span className="text-[11px] px-2 py-0.2 rounded-full bg-slate-800 font-mono text-slate-300 font-medium border border-slate-700/60">
+            <span className="text-[11px] px-2 py-0.2 rounded-full bg-slate-800 font-mono text-slate-300 font-medium border border-slate-700/60" title={`${list.cards.length} cards`}>
               {list.cards.length}
             </span>
-            {list.isTwoColumns && (
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">
-                2-Col
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-0.5">
@@ -270,13 +270,15 @@ export const ListColumn: React.FC<ListColumnProps> = ({
             >
               <Settings className="w-3.5 h-3.5" />
             </button>
-            <button
-              onClick={() => onAddCard(list.id)}
-              className="p-1.5 rounded-lg text-slate-300 hover:text-white bg-slate-800 hover:bg-indigo-600 transition-colors border border-slate-700/60"
-              title="Add Card"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
+            {list.listType !== 'chat_feed' && (
+              <button
+                onClick={() => onAddCard(list.id)}
+                className="p-1.5 rounded-lg text-slate-300 hover:text-white bg-slate-800 hover:bg-indigo-600 transition-colors border border-slate-700/60"
+                title="Add Card"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            )}
             {onDeleteList && (
               <button
                 onClick={() => {
@@ -313,9 +315,12 @@ export const ListColumn: React.FC<ListColumnProps> = ({
       </div>
 
       {/* Cards Stream Area */}
-      <div className={`flex-1 overflow-y-auto p-2.5 custom-scrollbar ${
-        list.isTwoColumns ? 'grid grid-cols-1 md:grid-cols-2 gap-2.5 space-y-0' : 'space-y-2.5'
-      }`}>
+      <div 
+        ref={cardsContainerRef}
+        className={`flex-1 overflow-y-auto p-2.5 custom-scrollbar ${
+          list.isTwoColumns ? 'grid grid-cols-1 md:grid-cols-2 gap-2.5 space-y-0' : 'space-y-2.5'
+        }`}
+      >
         {displayCards.map(card => (
           <CardItem
             key={card.id}

@@ -321,9 +321,10 @@ export default function App() {
 
         const finalLists = updatedLists.map(list => {
           if (list.id === targetListId) {
+            const isChatFeed = list.listType === 'chat_feed';
             return {
               ...list,
-              cards: [movedCard!, ...list.cards]
+              cards: isChatFeed ? [...list.cards, movedCard!] : [movedCard!, ...list.cards]
             };
           }
           return list;

@@ -266,7 +266,6 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
       {/* Lists Navigator Bottom Bar */}
       <div className="px-4 py-2 bg-black/40 backdrop-blur-md border-t border-white/10 flex items-center text-xs text-slate-300">
         <div className="flex items-center gap-2 overflow-x-auto py-0.5 w-full custom-scrollbar">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">Lists Navigator:</span>
           {board.lists.map((l, idx) => (
             <button
               key={l.id}

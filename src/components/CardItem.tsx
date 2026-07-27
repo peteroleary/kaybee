@@ -158,6 +158,87 @@ export const CardItem: React.FC<CardItemProps> = ({
 
   const contributionScore = computeContributionScore();
 
+  const isMessageCard = Boolean(card.chatSender) || (card.tags && card.tags.includes('Chat-Message'));
+
+  const isCustomized = Boolean(
+    (card.widgets && card.widgets.length > 0) ||
+    (card.subtasks && card.subtasks.length > 0) ||
+    card.delegate ||
+    (card.dependsOnCardIds && card.dependsOnCardIds.length > 0) ||
+    (card.timeLogs && card.timeLogs.length > 0) ||
+    card.isPinned ||
+    (card.priority === 'urgent' || card.priority === 'high') ||
+    (card.tags && card.tags.filter(t => t !== 'Chat-Message' && t !== 'New').length > 0) ||
+    card.lastExecutionOutput ||
+    (card.attachments && card.attachments.length > 0)
+  );
+
+  if (isMessageCard && !isCustomized) {
+    return (
+      <div
+        onClick={() => onOpenCardDetail(card)}
+        draggable={true}
+        onDragStart={(e) => {
+          setIsDragging(true);
+          e.dataTransfer.setData('application/json', JSON.stringify({ cardId: card.id, sourceListId: listId }));
+          e.dataTransfer.effectAllowed = 'move';
+        }}
+        onDragEnd={() => setIsDragging(false)}
+        className={`group relative bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl p-3 shadow transition-colors cursor-grab active:cursor-grabbing flex flex-col gap-1.5 ${
+          isDragging ? 'opacity-60 border-indigo-500 bg-slate-800' : ''
+        }`}
+      >
+        {/* Hover Delete Action */}
+        <div className="absolute top-2 right-2 flex items-center gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onDeleteCard && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`Delete message "${card.title}"?`)) {
+                  onDeleteCard(card.id, listId);
+                }
+              }}
+              className="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors"
+              title="Delete Message"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Sender Line if available */}
+        {card.chatSender ? (
+          <div className="flex items-center gap-2 pr-6">
+            <img
+              src={card.chatSender.avatar || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=120'}
+              alt={card.chatSender.name}
+              className="w-5 h-5 rounded-full object-cover border border-slate-600"
+            />
+            <div className="flex items-center justify-between flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-xs font-semibold text-slate-200 truncate">{card.chatSender.name}</span>
+                {card.chatSender.isAgent && (
+                  <span className="text-[9px] px-1 rounded bg-indigo-500/30 text-indigo-300 font-medium">AI</span>
+                )}
+              </div>
+              <span className="text-[10px] text-slate-500 font-mono flex-shrink-0 ml-2">{card.chatSender.timestamp}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between text-[10px] text-slate-400 pr-6">
+            <span className="font-semibold text-slate-300">{card.title}</span>
+            <span className="font-mono">{card.createdAt || 'Just now'}</span>
+          </div>
+        )}
+
+        {/* Message Body */}
+        <div className="text-xs text-slate-200 leading-relaxed break-words pl-0.5">
+          {card.description || card.title}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       onClick={() => onOpenCardDetail(card)}
@@ -185,17 +266,18 @@ export const CardItem: React.FC<CardItemProps> = ({
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Pinned Badge Indicator if pinned */}
           {card.isPinned && (
-            <span className="flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" title="Pinned to top">
+            <span className="p-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" title="Pinned to top">
               <Pin className="w-2.5 h-2.5 fill-indigo-400 text-indigo-400" />
-              <span>Pinned</span>
             </span>
           )}
 
           {/* Entity Badge */}
-          <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-medium border ${entityIcons[card.entityType]?.color}`}>
-            <EntityIcon className="w-2.5 h-2.5" />
-            <span>{entityIcons[card.entityType]?.label}</span>
-          </span>
+          {card.entityType !== 'task' && (
+            <span className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-medium border ${entityIcons[card.entityType]?.color}`}>
+              <EntityIcon className="w-2.5 h-2.5" />
+              <span>{entityIcons[card.entityType]?.label}</span>
+            </span>
+          )}
 
           {/* Priority Tag */}
           <span className={`px-1.5 py-0.2 rounded text-[10px] font-semibold border uppercase ${priorityColors[card.priority]}`}>
@@ -211,9 +293,9 @@ export const CardItem: React.FC<CardItemProps> = ({
 
           {/* Depends On Badge */}
           {card.dependsOnCardIds && card.dependsOnCardIds.length > 0 && (
-            <span className="flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] bg-slate-700/40 text-slate-300 border border-slate-600/60" title={`Depends on ${card.dependsOnCardIds.length} task(s)`}>
+            <span className="flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] bg-slate-700/40 text-slate-300 border border-slate-600/60" title={`Depends on ${card.dependsOnCardIds.length} prerequisite task(s)`}>
               <Link className="w-2.5 h-2.5 text-slate-400" />
-              <span>{card.dependsOnCardIds.length} Deps</span>
+              <span>{card.dependsOnCardIds.length}</span>
             </span>
           )}
 
@@ -242,9 +324,8 @@ export const CardItem: React.FC<CardItemProps> = ({
           </button>
 
           {card.targetBoardFeedId && (
-            <span className="flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] bg-indigo-950/40 text-indigo-300 border border-indigo-800/60 font-mono" title="Feeds to another board">
+            <span className="p-1 rounded bg-indigo-950/40 text-indigo-300 border border-indigo-800/60" title="Feeds to another board">
               <GitFork className="w-3 h-3 text-indigo-400" />
-              <span>Routed</span>
             </span>
           )}
 
