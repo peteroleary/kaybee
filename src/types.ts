@@ -1,4 +1,6 @@
-export type EntityType = 
+import type { AgentCapabilityId } from './shared/agentCapabilities';
+
+export type EntityType =
   | 'task' 
   | 'human' 
   | 'agent' 
@@ -29,19 +31,13 @@ export interface UserGoal {
   updatedAt: string;
   boardIds: string[]; // Associated boards
   progress: number; // 0-100
+  /** @deprecated superseded by the typed plan in Phase 5 */
   decomposedLists?: any[]; // AI-generated list structure
   assignedAgentTypes?: string[];
 }
 
 // Autonomous Agent Types
-export type AgentCapability = 
-  | 'code_quality' 
-  | 'testing' 
-  | 'documentation' 
-  | 'security' 
-  | 'deployment'
-  | 'analysis'
-  | 'communication';
+export type AgentCapability = AgentCapabilityId;
 
 export interface AgentDefinition {
   id: string;
@@ -164,6 +160,11 @@ export interface CardItemData {
   hiddenMetadataFields?: string[];
   isPinned?: boolean;
   comments?: CardComment[];
+  assignedAgentId?: string | null;
+  assignmentHint?: string | null;
+  goalId?: string | null;
+  revision?: number;
+  lineage?: { rootCardId: string; hopCount: number } | null;
 }
 
 export interface ListConfig {
