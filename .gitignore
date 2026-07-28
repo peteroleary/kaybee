@@ -61,3 +61,5 @@ Thumbs.db
 .env.local
 .env.*
 ```
+# Playwright MCP verification artifacts
+.playwright-mcp/
