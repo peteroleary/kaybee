@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { BoardData, CardItemData, ListConfig, FeedForwardConnection, ActivityLog, RBACRole } from '../types';
 
 interface UseBoardStateReturn {
