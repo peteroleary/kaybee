@@ -8,7 +8,12 @@ import {
   createUserWithEmailAndPassword,
   Auth
 } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import {
+  Firestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyBW7hLRk7sWirfXBJHnzUnqP0znLztnLiI",
@@ -26,8 +31,14 @@ const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : get
 // Initialize Firebase Auth
 const auth: Auth = getAuth(app);
 
-// Initialize Cloud Firestore
-const db: Firestore = getFirestore(app);
+// Initialize Cloud Firestore with a persistent, multi-tab-aware local cache.
+// This enables latency compensation: local writes appear in onSnapshot
+// listeners immediately (metadata.hasPendingWrites) before the server acks,
+// so repository writers should be pure write-through rather than hand-rolling
+// an optimistic layer on top.
+const db: Firestore = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+});
 
 // Initialize Providers
 const googleProvider = new GoogleAuthProvider();

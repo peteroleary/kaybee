@@ -2,25 +2,73 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is authenticated
-    function isAuthenticated() {
+    function signedIn() {
       return request.auth != null;
     }
 
-    // Helper function to check if user owns the document
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    function owns(d) {
+      return signedIn() && d.data.ownerUid == request.auth.uid;
     }
 
-    // User profiles collection
+    function creatingOwn() {
+      return signedIn() && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    function ownerUnchanged() {
+      return request.resource.data.ownerUid == resource.data.ownerUid;
+    }
+
+    // User profile: seededAt, tagColors, autonomy policy placeholder.
+    // Strictly single-owner — no cross-user read, unlike the collections below.
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isOwner(userId);
+      allow read, write: if signedIn() && request.auth.uid == userId;
     }
 
-    // App collections (boards, cards, routines, swarms, activity logs)
+    match /boards/{boardId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+    }
+
+    match /lists/{listId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+    }
+
+    match /cards/{cardId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+    }
+
+    match /goals/{goalId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+    }
+
+    match /templates/{templateId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+    }
+
+    // Activity log is append-only: no update, no delete.
+    match /activity/{activityId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if false;
+      allow delete: if false;
+    }
+
     match /{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if false;
     }
   }
 }
