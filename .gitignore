@@ -1,8 +1,44 @@
+```
+# Dependencies
 node_modules/
-build/
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Compiled and build artifacts
 dist/
-coverage/
-.DS_Store
+build/
+target/
+
+# Cache directories
+.cache/
+.node_cache/
+.npm/
+.yarn/
+
+# Logs
 *.log
-.env*
-!.env.example
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python specific (if applicable)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+```
