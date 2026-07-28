@@ -1,0 +1,432 @@
+# Instincts generated from https://github.com/peteroleary/kaybee
+# Generated: 2026-07-28T00:06:51.075Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: kaybee-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: refactor
+
+## Evidence
+
+- 1 commits analyzed
+- Detected conventional commit pattern
+- Examples: Refactor: modularize server logic and extract board state hook
+
+---
+id: kaybee-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Commit Length
+
+## Action
+
+Write moderate-length commit messages (~62 characters)
+
+## Evidence
+
+- Average commit message length: 62 chars
+- Based on 1 commits
+
+---
+id: kaybee-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: kaybee-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: kaybee-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Export Style
+
+## Action
+
+Prefer mixed exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: mixed
+
+---
+id: kaybee-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: hooks, server
+
+---
+id: kaybee-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/peteroleary/kaybee
+---
+
+# Kaybee Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: kaybee-instinct-file-naming
+trigger: "When creating a new file in the codebase"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct File Naming
+
+## Action
+
+Name the file using camelCase convention
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-function-naming
+trigger: "When defining a new function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Function Naming
+
+## Action
+
+Use camelCase for the function name
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-class-naming
+trigger: "When defining a new class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Class Naming
+
+## Action
+
+Use PascalCase for the class name
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-constant-naming
+trigger: "When declaring a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Constant Naming
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for the constant name
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-import-style
+trigger: "When importing modules within the codebase"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Import Style
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-export-style
+trigger: "When exporting modules or functions"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Export Style
+
+## Action
+
+Use either named or default exports as appropriate (mixed export style)
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-commit-format
+trigger: "When making a git commit"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Commit Format
+
+## Action
+
+Use the Conventional Commits format, starting with a type prefix (e.g., 'refactor:') and a concise summary
+
+## Evidence
+
+- Seen in commit: 'Refactor: modularize server logic and extract board state hook'
+
+---
+id: kaybee-instinct-refactor-prefix
+trigger: "When committing a code refactor"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Refactor Prefix
+
+## Action
+
+Prefix the commit message with 'refactor:'
+
+## Evidence
+
+- Seen in commit: 'Refactor: modularize server logic and extract board state hook'
+
+---
+id: kaybee-instinct-commit-length
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Commit Length
+
+## Action
+
+Keep the commit summary around 62 characters on average
+
+## Evidence
+
+- Average commit length: 62
+
+---
+id: kaybee-instinct-error-handling
+trigger: "When handling errors in code"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Error Handling
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-no-custom-errors
+trigger: "When defining error handling logic"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct No Custom Errors
+
+## Action
+
+Do not create custom error classes; use standard errors
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-no-error-boundaries
+trigger: "When considering error boundaries in the architecture"
+confidence: 0.7
+domain: architecture
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct No Error Boundaries
+
+## Action
+
+Do not implement error boundaries
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-no-global-error-handler
+trigger: "When considering global error handling"
+confidence: 0.7
+domain: architecture
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct No Global Error Handler
+
+## Action
+
+Do not implement a global error handler
+
+## Evidence
+
+- Pattern in files: src/hooks, src/server
+
+---
+id: kaybee-instinct-test-location
+trigger: "When adding or organizing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Test Location
+
+## Action
+
+Place tests in a separate location from the source code
+
+## Evidence
+
+- testLocation: separate
+
+---
+id: kaybee-instinct-module-organization
+trigger: "When organizing modules in the codebase"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: peteroleary/kaybee
+---
+
+# Kaybee Instinct Module Organization
+
+## Action
+
+Organize modules by type (e.g., hooks, server)
+
+## Evidence
+
+- srcLayout: ['hooks', 'server']
+
