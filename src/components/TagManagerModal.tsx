@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { BoardData } from '../types';
 import { getTagStyle, PRESET_TAG_COLORS } from '../data/tagsAndThemes';
+import { Modal } from './ui/Modal';
 
 interface TagManagerModalProps {
   isOpen: boolean;
@@ -111,11 +112,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div 
-        className="w-full max-w-3xl bg-slate-900 border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] ring-1 ring-white/10"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-3xl max-h-[85vh]">
         {/* Header */}
         <div className="px-6 py-4 bg-slate-950/60 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -302,7 +299,7 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                         </span>
 
                         {/* Occurrence Stats */}
-                        <div className="text-[11px] text-slate-400 flex items-center gap-2 pl-2 border-l border-white/10">
+                        <div className="text-xs text-slate-400 flex items-center gap-2 pl-2 border-l border-white/10">
                           <span className="font-semibold text-slate-200">{t.count} card{t.count !== 1 ? 's' : ''}</span>
                           <span className="text-slate-600">•</span>
                           <span>{t.boardsCount} board{t.boardsCount !== 1 ? 's' : ''}</span>
@@ -353,19 +350,19 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
                     {/* Delete Button */}
                     {isConfirmingDelete ? (
                       <div className="flex items-center gap-1 bg-rose-950/80 border border-rose-500/40 p-1 rounded-lg">
-                        <span className="text-[10px] text-rose-200 font-bold px-1">Delete?</span>
+                        <span className="text-xs text-rose-200 font-bold px-1">Delete?</span>
                         <button
                           onClick={() => {
                             onDeleteTag(t.name);
                             setConfirmDeleteTag(null);
                           }}
-                          className="px-2 py-0.5 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold rounded"
+                          className="px-2 py-0.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded"
                         >
                           Yes
                         </button>
                         <button
                           onClick={() => setConfirmDeleteTag(null)}
-                          className="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] rounded"
+                          className="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded"
                         >
                           No
                         </button>
@@ -387,8 +384,8 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
 
                   {/* Inline Color Picker Panel */}
                   {isColorPickerOpen && (
-                    <div className="w-full pt-2 border-t border-white/10 flex items-center justify-between gap-2 mt-1 animate-in slide-in-from-top-1 duration-150">
-                      <span className="text-[11px] text-slate-400 font-semibold">Select Color Aesthetic:</span>
+                    <div className="w-full pt-2 border-t border-white/10 flex items-center justify-between gap-2 mt-1">
+                      <span className="text-xs text-slate-400 font-semibold">Select Color Aesthetic:</span>
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {Object.keys(PRESET_TAG_COLORS).map(colorKey => {
                           const preset = PRESET_TAG_COLORS[colorKey];
@@ -433,7 +430,6 @@ export const TagManagerModal: React.FC<TagManagerModalProps> = ({
             Done
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

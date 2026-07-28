@@ -13,6 +13,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { UserGoal, BoardData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface GoalCanvasModalProps {
   isOpen: boolean;
@@ -100,9 +101,7 @@ export const GoalCanvasModal: React.FC<GoalCanvasModalProps> = ({
   const completedGoals = goals.filter(g => g.status === 'completed');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900">
           <div className="flex items-center gap-3">
@@ -276,7 +275,7 @@ export const GoalCanvasModal: React.FC<GoalCanvasModalProps> = ({
                       </div>
                       <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-gradient-to-r from-indigo-600 to-purple-500 transition-all duration-500"
+                          className="h-full bg-indigo-600 transition-all duration-500"
                           style={{ width: `${goal.progress}%` }}
                         />
                       </div>
@@ -371,7 +370,6 @@ export const GoalCanvasModal: React.FC<GoalCanvasModalProps> = ({
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

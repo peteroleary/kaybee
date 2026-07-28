@@ -1,21 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Plus, 
-  Sparkles, 
-  CheckSquare, 
-  User, 
-  Bot, 
-  Workflow, 
-  Zap, 
-  Tag, 
-  FileText, 
-  Sliders,
-  AlertCircle
-} from 'lucide-react';
+import { X, Plus, Sparkles } from 'lucide-react';
 import { CARD_TEMPLATES, CardTemplate } from '../data/templates';
 import { CardItemData, EntityType, ListConfig } from '../types';
 import { autoSuggestTags } from '../utils/nlpAutoTag';
+import { Modal } from './ui/Modal';
 
 interface CreateCardModalProps {
   isOpen: boolean;
@@ -107,8 +95,7 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -118,7 +105,7 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
             <div>
               <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
                 <span>Create New Card</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono">
+                <span className="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono">
                   With Templates
                 </span>
               </h2>
@@ -153,7 +140,7 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
                 }`}
               >
                 <span className="font-bold block">Blank Card</span>
-                <span className="text-[10px] opacity-75">Start scratch</span>
+                <span className="text-xs opacity-75">Start scratch</span>
               </button>
 
               {CARD_TEMPLATES.map(tpl => (
@@ -168,7 +155,7 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
                   }`}
                 >
                   <span className="font-bold block truncate">{tpl.name}</span>
-                  <span className="text-[10px] text-slate-400 block truncate">{tpl.tags.join(', ')}</span>
+                  <span className="text-xs text-slate-400 block truncate">{tpl.tags.join(', ')}</span>
                 </button>
               ))}
             </div>
@@ -287,14 +274,14 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
             {/* Template Widgets Preview */}
             {selectedTemplate && selectedTemplate.widgets.length > 0 && (
               <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                   Pre-configured Widgets Included ({selectedTemplate.widgets.length})
                 </span>
                 <div className="space-y-1">
                   {selectedTemplate.widgets.map((w, idx) => (
                     <div key={idx} className="flex items-center justify-between text-xs text-slate-300 bg-white/5 p-2 rounded-lg border border-white/5">
                       <span className="font-medium">{w.label}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono capitalize">
+                      <span className="text-xs px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono capitalize">
                         {w.type}
                       </span>
                     </div>
@@ -316,13 +303,12 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
           <button
             onClick={handleCreate}
             disabled={!title.trim()}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs shadow-lg shadow-indigo-500/25 border border-white/10 transition-all flex items-center gap-1.5"
+            className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi disabled:opacity-40 text-white font-semibold text-xs transition-colors flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
             <span>Create Card</span>
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

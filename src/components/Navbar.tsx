@@ -30,8 +30,8 @@ import {
   User as UserIcon
 } from 'lucide-react';
 import { BoardData, RBACRole } from '../types';
-import { getTagStyle } from '../data/tagsAndThemes';
 import { useAuth } from '../context/AuthContext';
+import { IconButton } from './ui/IconButton';
 
 
 interface NavbarProps {
@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {dropdownOpen && (
             <div className="absolute top-full left-0 mt-1.5 w-60 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden py-1">
-              <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Boards ({boards.length})
               </div>
               {boards.map(board => (
@@ -281,98 +281,98 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
 
         {/* Board Router / Interconnect Trigger */}
-        <button
+        <IconButton
           onClick={onOpenInterconnect}
-          className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
           title="Board Interconnectivity & Feed-Forward Router"
+          aria-label="Board Interconnectivity & Feed-Forward Router"
         >
           <GitFork className="w-3.5 h-3.5" />
-        </button>
+        </IconButton>
 
         {/* Overview Map & Dependency Graph */}
         {onOpenOverviewMap && (
-          <button
+          <IconButton
             onClick={onOpenOverviewMap}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Overview Map & Dependency Graph"
+            aria-label="Overview Map & Dependency Graph"
           >
             <Network className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Voice Listener Trigger */}
         {onOpenVoice && (
-          <button
+          <IconButton
             onClick={onOpenVoice}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Voice-to-Action Listener"
+            aria-label="Voice-to-Action Listener"
           >
             <Mic className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Analytics Dashboard Trigger */}
         {onOpenAnalytics && (
-          <button
+          <IconButton
             onClick={onOpenAnalytics}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Analytics Telemetry Dashboard"
+            aria-label="Analytics Telemetry Dashboard"
           >
             <BarChart3 className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Board Theme Trigger */}
         {onOpenThemeModal && (
-          <button
+          <IconButton
             onClick={onOpenThemeModal}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Change Board Theme & Background Canvas"
+            aria-label="Change Board Theme & Background Canvas"
           >
             <Palette className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Auto-Archive Rules Trigger */}
         {onOpenAutoArchiveModal && (
-          <button
+          <IconButton
             onClick={onOpenAutoArchiveModal}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Auto-Archive Routine Rules"
+            aria-label="Auto-Archive Routine Rules"
           >
             <Archive className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Templates Library */}
-        <button
+        <IconButton
           onClick={onOpenTemplates}
-          className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
           title="Board Template Library"
+          aria-label="Board Template Library"
         >
           <Layout className="w-3.5 h-3.5" />
-        </button>
+        </IconButton>
 
         {/* Save as Template Tool */}
         {onOpenSaveTemplate && (
-          <button
+          <IconButton
             onClick={onOpenSaveTemplate}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Save Active Board Layout as Custom Template"
+            aria-label="Save Active Board Layout as Custom Template"
           >
             <BookmarkPlus className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Export High-Res Board Snapshot */}
         {onExportBoardImage && (
-          <button
+          <IconButton
             onClick={onExportBoardImage}
-            className="p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 transition-colors"
             title="Export High-Resolution Board Image"
+            aria-label="Export High-Resolution Board Image"
           >
             <Download className="w-3.5 h-3.5" />
-          </button>
+          </IconButton>
         )}
 
         {/* Tag / Hashtag Filter Modal Trigger Button */}
@@ -404,7 +404,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
-          <span className="px-1.5 font-mono text-[11px] text-slate-300 font-medium">{Math.round(zoomLevel * 100)}%</span>
+          <span className="px-1.5 font-mono text-xs text-slate-300 font-medium">{Math.round(zoomLevel * 100)}%</span>
           <button
             onClick={() => onChangeZoom(0.1)}
             className="p-1 text-slate-400 hover:text-slate-200 rounded transition-colors"
@@ -433,7 +433,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {roleDropdownOpen && (
             <div className="absolute right-0 top-full mt-1.5 w-40 bg-slate-900 border border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden py-1">
-              <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Access Level
               </div>
               {(['admin', 'contributor', 'ai_operator', 'viewer'] as RBACRole[]).map(role => (
@@ -463,7 +463,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <Activity className="w-3.5 h-3.5 text-slate-400" />
           {activityCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-indigo-500 text-[9px] font-bold text-white flex items-center justify-center border border-slate-900">
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-indigo-500 text-xs font-bold text-white flex items-center justify-center border border-slate-900">
               {activityCount > 9 ? '9+' : activityCount}
             </span>
           )}

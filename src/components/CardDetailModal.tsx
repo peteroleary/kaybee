@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { CardItemData, EntityType, InteractiveWidget, WidgetType, BoardData, CardComment } from '../types';
 import { TimeLoggerWidget } from './TimeLoggerWidget';
+import { Modal } from './ui/Modal';
 
 interface CardDetailModalProps {
   card: CardItemData | null;
@@ -328,8 +329,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-3xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -340,8 +340,8 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-slate-100">Card Studio & Interactivity Config</h2>
                 {isAgentCard && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/40 text-xs font-mono font-bold shadow-sm" title="Dynamic AI Agent Contribution & Efficiency Score">
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-bg-2 text-cyan-300 border border-cyan-500/40 text-xs font-mono font-bold" title="Dynamic AI Agent Contribution & Efficiency Score">
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Contribution Score: {contributionScore}%</span>
                   </span>
                 )}
@@ -357,10 +357,10 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
         {/* Content Body */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* Smart Suggestion Engine Trigger Banner */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-cyan-900/30 border border-indigo-500/30 shadow-lg backdrop-blur-md flex flex-col gap-3">
+          <div className="p-4 rounded-2xl bg-bg-2 border border-line flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+                <Sparkles className="w-4 h-4 text-cyan-400" />
                 <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Gemini Smart Suggestion Engine</span>
               </div>
               <button
@@ -390,11 +390,11 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                   <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
                     <div>
                       <span className="font-semibold text-slate-200 block">Suggested Subtasks ({suggestions.suggestedSubtasks.length})</span>
-                      <span className="text-[10px] text-slate-400">{suggestions.suggestedSubtasks.map(s => s.text).join(' • ')}</span>
+                      <span className="text-xs text-slate-400">{suggestions.suggestedSubtasks.map(s => s.text).join(' • ')}</span>
                     </div>
                     <button
                       onClick={handleApplySuggestedSubtasks}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-semibold text-[11px] whitespace-nowrap transition-colors"
+                      className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-semibold text-xs whitespace-nowrap transition-colors"
                     >
                       + Add Subtasks
                     </button>
@@ -405,11 +405,11 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                   <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
                     <div>
                       <span className="font-semibold text-slate-200 block">Suggested Interactive Widgets ({suggestions.suggestedWidgets.length})</span>
-                      <span className="text-[10px] text-slate-400">{suggestions.suggestedWidgets.map(w => w.label).join(', ')}</span>
+                      <span className="text-xs text-slate-400">{suggestions.suggestedWidgets.map(w => w.label).join(', ')}</span>
                     </div>
                     <button
                       onClick={handleApplySuggestedWidgets}
-                      className="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 font-semibold text-[11px] whitespace-nowrap transition-colors"
+                      className="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 font-semibold text-xs whitespace-nowrap transition-colors"
                     >
                       + Attach Widgets
                     </button>
@@ -420,11 +420,11 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                   <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
                     <div>
                       <span className="font-semibold text-slate-200 block">Suggested Agent Workflow</span>
-                      <span className="text-[10px] text-slate-400">{suggestions.suggestedWorkflow.name} ({suggestions.suggestedWorkflow.agentRole})</span>
+                      <span className="text-xs text-slate-400">{suggestions.suggestedWorkflow.name} ({suggestions.suggestedWorkflow.agentRole})</span>
                     </div>
                     <button
                       onClick={handleApplySuggestedWorkflow}
-                      className="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 font-semibold text-[11px] whitespace-nowrap transition-colors"
+                      className="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 font-semibold text-xs whitespace-nowrap transition-colors"
                     >
                       + Attach Workflow
                     </button>
@@ -508,7 +508,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                 <Link className="w-4 h-4 text-amber-400" />
                 <span>Card Dependencies ('Depends On' Links)</span>
               </div>
-              <span className="text-[10px] text-amber-300 font-mono">
+              <span className="text-xs text-amber-300 font-mono">
                 {(editedCard.dependsOnCardIds || []).length} Prerequisites
               </span>
             </div>
@@ -525,19 +525,19 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                         {isDone ? (
                           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                         ) : (
-                          <Lock className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                          <Lock className="w-4 h-4 text-amber-400 shrink-0" />
                         )}
                         <span className="font-semibold text-slate-200 truncate">
                           {targetCard ? targetCard.title : `Card #${depId.slice(0, 8)}`}
                         </span>
                         {targetCard && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-400">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-white/10 text-slate-400">
                             {targetCard.boardName}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-mono ${isDone ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded font-mono ${isDone ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}`}>
                           {isDone ? 'Completed' : 'Blocking'}
                         </span>
                         <button
@@ -612,7 +612,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
             {/* Metadata Fields Visibility Toggle Drawer in Edit Mode */}
             {isEditMode && (
               <div className="p-3 rounded-lg bg-indigo-950/40 border border-indigo-500/20 space-y-2">
-                <div className="text-[11px] font-semibold text-indigo-300 uppercase tracking-wider">
+                <div className="text-xs font-semibold text-indigo-300 uppercase tracking-wider">
                   Toggle Metadata Fields Visibility:
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-xs">
@@ -626,7 +626,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                       <button
                         key={field.id}
                         onClick={() => handleToggleMetadataField(field.id)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] transition-colors ${
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs transition-colors ${
                           isHidden 
                             ? 'bg-slate-900/80 border-rose-500/30 text-rose-300' 
                             : 'bg-indigo-500/20 border-indigo-500/30 text-indigo-200'
@@ -743,7 +743,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                             {s.text}
                           </span>
                         </div>
-                        <span className="font-mono font-bold text-indigo-300 text-[11px] min-w-[36px] text-right">
+                        <span className="font-mono font-bold text-indigo-300 text-xs min-w-[36px] text-right">
                           {itemProgress}%
                         </span>
                       </div>
@@ -753,7 +753,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                         <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
                           <div
                             className={`h-full transition-all duration-200 ${
-                              itemProgress === 100 ? 'bg-emerald-400' : 'bg-gradient-to-r from-indigo-500 to-cyan-400'
+                              itemProgress === 100 ? 'bg-emerald-400' : 'bg-indigo-500'
                             }`}
                             style={{ width: `${itemProgress}%` }}
                           />
@@ -805,7 +805,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsCommentAgent(false)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1 transition-all ${
+                  className={`px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1 transition-all ${
                     !isCommentAgent ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -815,7 +815,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsCommentAgent(true)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1 transition-all ${
+                  className={`px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1 transition-all ${
                     isCommentAgent ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -854,15 +854,15 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                             )}
                             <span className="text-xs font-bold text-slate-200">{topComment.author || topComment.authorName || 'Collaborator'}</span>
                             {topComment.isAgent && (
-                              <span className="px-1.5 py-0.2 bg-purple-500/30 text-purple-300 text-[9px] rounded font-mono font-bold">AI</span>
+                              <span className="px-1.5 py-0.2 bg-purple-500/30 text-purple-300 text-xs rounded font-mono font-bold">AI</span>
                             )}
                           </div>
-                          <span className="text-[10px] text-slate-400">{topComment.timestamp}</span>
+                          <span className="text-xs text-slate-400">{topComment.timestamp}</span>
                         </div>
 
                         <p className="text-xs text-slate-300 pl-7 leading-relaxed">{topComment.content || topComment.text}</p>
 
-                        <div className="pl-7 pt-1 flex items-center justify-between text-[11px]">
+                        <div className="pl-7 pt-1 flex items-center justify-between text-xs">
                           <button
                             onClick={() => setReplyParentId(replyParentId === topComment.id ? null : topComment.id)}
                             className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition-colors"
@@ -905,14 +905,14 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                                     ) : (
                                       <User className="w-3 h-3 text-emerald-400" />
                                     )}
-                                    <span className="text-[11px] font-bold text-slate-200">{reply.author || reply.authorName || 'Collaborator'}</span>
+                                    <span className="text-xs font-bold text-slate-200">{reply.author || reply.authorName || 'Collaborator'}</span>
                                     {reply.isAgent && (
-                                      <span className="px-1 bg-purple-500/30 text-purple-300 text-[8px] rounded font-mono">AI</span>
+                                      <span className="px-1 bg-purple-500/30 text-purple-300 text-xs rounded font-mono">AI</span>
                                     )}
                                   </div>
-                                  <span className="text-[9px] text-slate-400">{reply.timestamp}</span>
+                                  <span className="text-xs text-slate-400">{reply.timestamp}</span>
                                 </div>
-                                <p className="text-[11px] text-slate-300 pl-4">{reply.content || reply.text}</p>
+                                <p className="text-xs text-slate-300 pl-4">{reply.content || reply.text}</p>
                               </div>
                             ))}
                           </div>
@@ -973,7 +973,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
 
             {editedCard.lastExecutionOutput && (
               <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-indigo-200 leading-relaxed">
-                <div className="text-[10px] text-slate-400 font-bold mb-1">RUN LOG OUTPUT:</div>
+                <div className="text-xs text-slate-400 font-bold mb-1">RUN LOG OUTPUT:</div>
                 {editedCard.lastExecutionOutput}
               </div>
             )}
@@ -1001,11 +1001,10 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
               </button>
             )}
           </div>
-          <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition-all border border-white/10">
+          <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors">
             Save Card Changes
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

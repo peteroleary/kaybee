@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, GitFork, ArrowRight, Layers, Plus, ShieldCheck, Zap, Trash2 } from 'lucide-react';
+import { X, GitFork, ArrowRight, Plus, Zap, Trash2 } from 'lucide-react';
 import { BoardData, FeedForwardConnection } from '../types';
+import { Modal } from './ui/Modal';
 
 interface BoardInterconnectModalProps {
   isOpen: boolean;
@@ -55,8 +56,7 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-3xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -85,7 +85,7 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {/* Source Board */}
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-slate-400">Source Board</label>
+                <label className="text-xs font-semibold text-slate-400">Source Board</label>
                 <select
                   value={sourceBoardId}
                   onChange={(e) => {
@@ -102,7 +102,7 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
 
               {/* Source List */}
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-slate-400">Source List</label>
+                <label className="text-xs font-semibold text-slate-400">Source List</label>
                 <select
                   value={sourceListId}
                   onChange={(e) => setSourceListId(e.target.value)}
@@ -117,7 +117,7 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
 
               {/* Target Board */}
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-slate-400">Target Board</label>
+                <label className="text-xs font-semibold text-slate-400">Target Board</label>
                 <select
                   value={targetBoardId}
                   onChange={(e) => {
@@ -134,7 +134,7 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
 
               {/* Target List */}
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-slate-400">Target List</label>
+                <label className="text-xs font-semibold text-slate-400">Target List</label>
                 <select
                   value={targetListId}
                   onChange={(e) => setTargetListId(e.target.value)}
@@ -176,19 +176,19 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="flex flex-col">
                         <span className="font-bold text-indigo-300 truncate">{sB?.name}</span>
-                        <span className="text-[10px] text-slate-400 font-mono">{sL?.title}</span>
+                        <span className="text-xs text-slate-400 font-mono">{sL?.title}</span>
                       </div>
 
                       <ArrowRight className="w-4 h-4 text-purple-400 shrink-0" />
 
                       <div className="flex flex-col">
                         <span className="font-bold text-purple-300 truncate">{tB?.name}</span>
-                        <span className="text-[10px] text-slate-400 font-mono">{tL?.title}</span>
+                        <span className="text-xs text-slate-400 font-mono">{tL?.title}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-xs font-mono border border-emerald-500/30">
                         {conn.condition}
                       </span>
                       <button
@@ -218,7 +218,6 @@ export const BoardInterconnectModal: React.FC<BoardInterconnectModalProps> = ({
             Close
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

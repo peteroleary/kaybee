@@ -2,10 +2,7 @@ export interface BoardTheme {
   id: string;
   name: string;
   description: string;
-  bgGradient: string;
   canvasBg: string;
-  listBorder: string;
-  accentColor: string;
   previewColor: string;
 }
 
@@ -14,60 +11,42 @@ export const BOARD_THEMES: BoardTheme[] = [
     id: 'indigo-nebula',
     name: 'Indigo Nebula',
     description: 'Deep cosmic space gradient with subtle purple particle glows',
-    bgGradient: 'from-slate-950 via-indigo-950/80 to-slate-900',
-    canvasBg: 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-900',
-    listBorder: 'border-indigo-500/20',
-    accentColor: 'indigo',
+    canvasBg: 'bg-bg-0',
     previewColor: 'bg-indigo-600'
   },
   {
     id: 'emerald-matrix',
     name: 'Emerald Cyber Matrix',
     description: 'High-tech dark emerald and teal glow layout',
-    bgGradient: 'from-slate-950 via-emerald-950/70 to-slate-900',
-    canvasBg: 'bg-gradient-to-br from-slate-950 via-emerald-950/60 to-slate-900',
-    listBorder: 'border-emerald-500/20',
-    accentColor: 'emerald',
+    canvasBg: 'bg-emerald-950/10',
     previewColor: 'bg-emerald-600'
   },
   {
     id: 'sunset-amber',
     name: 'Sunset Twilight',
     description: 'Warm twilight glow combining dark rose and golden amber',
-    bgGradient: 'from-slate-950 via-rose-950/70 to-amber-950/60',
-    canvasBg: 'bg-gradient-to-br from-slate-950 via-rose-950/60 to-amber-950/50',
-    listBorder: 'border-amber-500/20',
-    accentColor: 'amber',
+    canvasBg: 'bg-amber-950/10',
     previewColor: 'bg-amber-600'
   },
   {
     id: 'cyber-neon',
     name: 'Cyberpunk Neon',
     description: 'Electric cyan and magenta high-density workspace theme',
-    bgGradient: 'from-slate-950 via-cyan-950/80 to-purple-950/70',
-    canvasBg: 'bg-gradient-to-br from-slate-950 via-cyan-950/70 to-purple-950/60',
-    listBorder: 'border-cyan-500/30',
-    accentColor: 'cyan',
+    canvasBg: 'bg-cyan-950/10',
     previewColor: 'bg-cyan-500'
   },
   {
     id: 'obsidian-gold',
     name: 'Obsidian Gold',
     description: 'Executive luxury dark obsidian canvas with warm golden highlights',
-    bgGradient: 'from-zinc-950 via-stone-900 to-amber-950/40',
-    canvasBg: 'bg-gradient-to-br from-zinc-950 via-stone-900 to-amber-950/30',
-    listBorder: 'border-amber-400/20',
-    accentColor: 'amber',
+    canvasBg: 'bg-stone-950/10',
     previewColor: 'bg-yellow-500'
   },
   {
     id: 'glass-aurora',
     name: 'Glass Aurora',
     description: 'Luminous multi-hue aurora mesh with frosted glass panels',
-    bgGradient: 'from-slate-950 via-blue-950/70 to-teal-950/60',
-    canvasBg: 'bg-gradient-to-br from-slate-950 via-blue-950/60 to-teal-950/50',
-    listBorder: 'border-teal-500/20',
-    accentColor: 'teal',
+    canvasBg: 'bg-teal-950/10',
     previewColor: 'bg-teal-500'
   }
 ];
@@ -101,7 +80,7 @@ export const TAG_COLOR_MAP: Record<string, { bg: string; text: string; border: s
   bug: PRESET_TAG_COLORS.rose,
   feature: PRESET_TAG_COLORS.emerald,
   security: PRESET_TAG_COLORS.purple,
-  urgent: { bg: 'bg-red-500/20', text: 'text-red-300', border: 'border-red-500/30', dot: 'bg-red-500 animate-ping' },
+  urgent: { bg: 'bg-red-500/20', text: 'text-red-300', border: 'border-red-500/30', dot: 'bg-red-500' },
   ai: PRESET_TAG_COLORS.cyan,
   agent: PRESET_TAG_COLORS.cyan,
   'ui/ux': PRESET_TAG_COLORS.amber,

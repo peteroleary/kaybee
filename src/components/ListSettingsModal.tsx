@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Settings, GitFork, Bot, Users, Zap, MessageSquare, Workflow } from 'lucide-react';
+import { X, Settings, GitFork } from 'lucide-react';
 import { ListConfig, ListType, HomogenousType, BoardData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface ListSettingsModalProps {
   list: ListConfig | null;
@@ -29,8 +30,7 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
   const selectedTargetBoard = availableBoards.find(b => b.id === editedList.feedForwardTargetBoardId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-slate-400">Target Board</label>
+                <label className="text-xs font-semibold text-slate-400">Target Board</label>
                 <select
                   value={editedList.feedForwardTargetBoardId || ''}
                   onChange={(e) => setEditedList({ ...editedList, feedForwardTargetBoardId: e.target.value || undefined })}
@@ -118,7 +118,7 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
 
               {selectedTargetBoard && (
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-slate-400">Target List</label>
+                  <label className="text-xs font-semibold text-slate-400">Target List</label>
                   <select
                     value={editedList.feedForwardTargetListId || ''}
                     onChange={(e) => setEditedList({ ...editedList, feedForwardTargetListId: e.target.value })}
@@ -138,7 +138,7 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 text-xs backdrop-blur-md">
             <div className="flex flex-col">
               <span className="font-medium text-slate-200">2-Column Cards Grid Layout</span>
-              <span className="text-[10px] text-slate-400">Expand list width and organize cards into a 2-column grid.</span>
+              <span className="text-xs text-slate-400">Expand list width and organize cards into a 2-column grid.</span>
             </div>
             <input
               type="checkbox"
@@ -152,7 +152,7 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
           <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 text-xs backdrop-blur-md">
             <div className="flex flex-col">
               <span className="font-medium text-slate-200">Auto-sort Cards by Priority</span>
-              <span className="text-[10px] text-slate-400">Automatically reorders cards whenever priority updates (Urgent &gt; High &gt; Medium &gt; Low).</span>
+              <span className="text-xs text-slate-400">Automatically reorders cards whenever priority updates (Urgent &gt; High &gt; Medium &gt; Low).</span>
             </div>
             <input
               type="checkbox"
@@ -179,11 +179,10 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
           <button onClick={onClose} className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 font-medium text-xs transition-colors">
             Cancel
           </button>
-          <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 border border-white/10">
+          <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors">
             Save List Config
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

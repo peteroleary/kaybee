@@ -1,20 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { 
-  X, 
-  Sparkles, 
-  Mic, 
-  MicOff, 
-  Send, 
-  Bot, 
-  Layers, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2, 
+import {
+  X,
+  Sparkles,
+  Mic,
+  MicOff,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
   Zap,
-  Wand2,
-  ArrowRight
+  Wand2
 } from 'lucide-react';
 import { BoardData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface OrchestratorModalProps {
   isOpen: boolean;
@@ -153,13 +151,12 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-2xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-lg shadow-indigo-500/30">
-              <Sparkles className="w-5 h-5 animate-pulse" />
+            <div className="p-2 rounded-xl bg-accent text-white">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -203,7 +200,7 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                     <div className="text-xs font-bold text-slate-200 group-hover:text-indigo-300">
                       {p.label}
                     </div>
-                    <div className="text-[11px] text-slate-400 line-clamp-1">
+                    <div className="text-xs text-slate-400 line-clamp-1">
                       {p.prompt}
                     </div>
                   </div>
@@ -232,7 +229,7 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                   type="button"
                   className={`p-2 rounded-xl transition-all ${
                     isRecording 
-                      ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-500/40' 
+                      ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/40' 
                       : 'bg-white/10 hover:bg-white/20 text-slate-300 border border-white/10'
                   }`}
                   title={isRecording ? 'Stop Recording Voice' : 'Hold to record voice prompt'}
@@ -243,7 +240,7 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                 <button
                   onClick={() => handleRunOrchestrator()}
                   disabled={loading || !prompt.trim()}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 disabled:opacity-50 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 transition-all border border-white/10"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent hover:bg-accent-hi disabled:opacity-50 text-white font-medium text-xs transition-colors"
                 >
                   {loading ? (
                     <>
@@ -271,7 +268,7 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
 
           {/* Output Execution Result */}
           {orchestratorOutput && (
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3 animate-in slide-in-from-bottom-2 duration-300 backdrop-blur-md">
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3">
               <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4" />
@@ -285,11 +282,11 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
 
               {orchestratorOutput.newLists && orchestratorOutput.newLists.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-[11px] font-semibold text-slate-400">New Lists Created ({orchestratorOutput.newLists.length}):</span>
+                  <span className="text-xs font-semibold text-slate-400">New Lists Created ({orchestratorOutput.newLists.length}):</span>
                   {orchestratorOutput.newLists.map((nl: any, idx: number) => (
                     <div key={idx} className="p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200 flex items-center justify-between">
                       <span className="font-semibold">{nl.title} ({nl.listType})</span>
-                      <span className="text-[10px] bg-indigo-500/20 px-2 py-0.5 rounded text-indigo-300">{nl.cards?.length || 0} cards</span>
+                      <span className="text-xs bg-indigo-500/20 px-2 py-0.5 rounded text-indigo-300">{nl.cards?.length || 0} cards</span>
                     </div>
                   ))}
                 </div>
@@ -311,7 +308,6 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
             Done
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Archive, CheckCircle2, Clock, AlertCircle, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
-import { BoardData, CardItemData, ListConfig } from '../types';
+import { X, Archive, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
+import { BoardData, CardItemData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface AutoArchiveModalProps {
   isOpen: boolean;
@@ -46,9 +47,8 @@ export const AutoArchiveModal: React.FC<AutoArchiveModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10">
-        
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
+
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ export const AutoArchiveModal: React.FC<AutoArchiveModalProps> = ({
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <span>Auto-Archive Routine</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/30">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-500/30">
                   7-Day Threshold
                 </span>
               </h2>
@@ -106,7 +106,7 @@ export const AutoArchiveModal: React.FC<AutoArchiveModalProps> = ({
           <div className="space-y-2">
             <div className="text-xs font-bold text-slate-300 flex items-center justify-between">
               <span>Eligible Cards for Archiving ({eligibleCards.length})</span>
-              <span className="text-[11px] font-mono text-slate-400">Board: {board.name}</span>
+              <span className="text-xs font-mono text-slate-400">Board: {board.name}</span>
             </div>
 
             {eligibleCards.length === 0 ? (
@@ -124,7 +124,7 @@ export const AutoArchiveModal: React.FC<AutoArchiveModalProps> = ({
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span className="font-medium text-slate-200 truncate">{card.title}</span>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-mono bg-white/5 px-2 py-0.5 rounded shrink-0">
+                    <span className="text-xs text-slate-400 font-mono bg-white/5 px-2 py-0.5 rounded shrink-0">
                       From: {listTitle}
                     </span>
                   </div>
@@ -164,7 +164,6 @@ export const AutoArchiveModal: React.FC<AutoArchiveModalProps> = ({
           </div>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   );
 };

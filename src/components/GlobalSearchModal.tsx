@@ -14,6 +14,7 @@ import {
   CornerDownLeft
 } from 'lucide-react';
 import { BoardData, CardItemData, ListConfig } from '../types';
+import { Modal } from './ui/Modal';
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
@@ -83,8 +84,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   const totalResults = matchedBoards.length + matchedLists.length + matchedCards.length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-950/75 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} align="top" className="max-w-2xl max-h-[80vh]">
         {/* Search Input Bar */}
         <div className="flex items-center px-4 py-3.5 border-b border-white/10 bg-white/5 gap-3">
           <Search className="w-5 h-5 text-indigo-400 shrink-0" />
@@ -120,7 +120,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               <p className="text-xs text-slate-400">
                 Type keywords to search cards, tags, lists, or board titles.
               </p>
-              <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-mono pt-2">
+              <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-mono pt-2">
                 <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">Ctrl + K</span>
                 <span>or</span>
                 <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">Ctrl + N</span>
@@ -138,7 +138,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Cards Section */}
           {matchedCards.length > 0 && (
             <div className="space-y-2">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
                 <span>Matching Cards ({matchedCards.length})</span>
                 <span className="text-indigo-400 font-mono">Tasks & Routines</span>
               </div>
@@ -157,14 +157,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <span className="font-bold text-xs text-slate-100 group-hover:text-indigo-300 transition-colors truncate">
                           {card.title}
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30 shrink-0 capitalize">
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30 shrink-0 capitalize">
                           {card.entityType}
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
+                      <span className="text-xs text-slate-400 line-clamp-1 mt-0.5">
                         {card.description}
                       </span>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-1">
+                      <div className="flex items-center gap-2 text-xs text-slate-500 font-mono mt-1">
                         <span>Board: {board.name}</span>
                         <span>•</span>
                         <span>List: {list.title}</span>
@@ -180,7 +180,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Lists Section */}
           {matchedLists.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-white/10">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Matching Lists ({matchedLists.length})
               </div>
               <div className="space-y-1.5">
@@ -199,10 +199,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <span className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition-colors">
                           {list.title}
                         </span>
-                        <span className="text-[10px] text-slate-400 block">Board: {board.name}</span>
+                        <span className="text-xs text-slate-400 block">Board: {board.name}</span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">
+                    <span className="text-xs font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">
                       {list.cards.length} cards
                     </span>
                   </div>
@@ -214,7 +214,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* Boards Section */}
           {matchedBoards.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-white/10">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 Matching Boards ({matchedBoards.length})
               </div>
               <div className="space-y-1.5">
@@ -233,10 +233,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                         <span className="text-xs font-semibold text-slate-200 group-hover:text-purple-300 transition-colors">
                           {board.name}
                         </span>
-                        <span className="text-[10px] text-slate-400 block">{board.category}</span>
+                        <span className="text-xs text-slate-400 block">{board.category}</span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30">
+                    <span className="text-xs font-mono text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30">
                       {board.lists.length} lists
                     </span>
                   </div>
@@ -247,11 +247,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="px-4 py-2 border-t border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        <div className="px-4 py-2 border-t border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between text-xs text-slate-400 font-mono">
           <span>{totalResults} results indexed</span>
-          <span>Press ESC or click outside to dismiss</span>
+          <span>Press ESC to dismiss</span>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

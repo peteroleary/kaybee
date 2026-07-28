@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { BoardData } from '../types';
 import { BoardTemplate } from '../data/templates';
+import { Modal } from './ui/Modal';
 
 interface SaveTemplateModalProps {
   isOpen: boolean;
@@ -95,9 +96,8 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10">
-        
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-xl">
+
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -107,7 +107,7 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <span>Save Board as Template</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30">
                   Custom Template Builder
                 </span>
               </h2>
@@ -129,8 +129,8 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[80vh] custom-scrollbar">
           
           {/* Active Board Snapshot Summary Box */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-slate-900 border border-indigo-500/30 space-y-2">
-            <div className="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-wider flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-bg-2 border border-line space-y-2">
+            <div className="text-xs font-mono text-indigo-400 font-bold uppercase tracking-wider flex items-center justify-between">
               <span>Captured Snapshot Stats</span>
               <span className="text-emerald-400 flex items-center gap-1">
                 <Check className="w-3 h-3" />
@@ -141,17 +141,17 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
             <div className="grid grid-cols-3 gap-3 pt-1">
               <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-center">
                 <div className="text-lg font-black text-white">{activeBoard.lists.length}</div>
-                <div className="text-[10px] text-slate-400 uppercase font-mono">Lists / Columns</div>
+                <div className="text-xs text-slate-400 uppercase font-mono">Lists / Columns</div>
               </div>
 
               <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-center">
                 <div className="text-lg font-black text-indigo-300">{totalCards}</div>
-                <div className="text-[10px] text-slate-400 uppercase font-mono">Total Cards</div>
+                <div className="text-xs text-slate-400 uppercase font-mono">Total Cards</div>
               </div>
 
               <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-center">
                 <div className="text-lg font-black text-cyan-300">{totalAutomations}</div>
-                <div className="text-[10px] text-slate-400 uppercase font-mono">Automations</div>
+                <div className="text-xs text-slate-400 uppercase font-mono">Automations</div>
               </div>
             </div>
           </div>
@@ -242,7 +242,7 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
 
           {/* Success Banner */}
           {isSavedSuccess && (
-            <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200">
+            <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Template saved successfully! Available in Template Library.</span>
             </div>
@@ -261,7 +261,7 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
             <button
               type="submit"
               disabled={isSavedSuccess || !templateName.trim()}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:opacity-90 disabled:opacity-50 text-white text-xs font-bold shadow-lg shadow-indigo-500/30 flex items-center gap-2 transition-all"
+              className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi disabled:opacity-50 text-white text-xs font-bold flex items-center gap-2 transition-colors"
             >
               <BookmarkPlus className="w-4 h-4" />
               <span>Save Custom Template</span>
@@ -270,7 +270,6 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
 
         </form>
 
-      </div>
-    </div>
+    </Modal>
   );
 };

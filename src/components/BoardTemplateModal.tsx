@@ -1,32 +1,27 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Sparkles, 
-  Layers, 
-  Workflow, 
-  Bot, 
-  CheckSquare, 
-  Zap, 
-  ArrowRight, 
-  Plus, 
-  Check, 
-  Search,
-  Code,
-  Users,
-  MessageSquare,
+import {
+  X,
+  Sparkles,
+  Layers,
+  Workflow,
+  Bot,
+  CheckSquare,
+  Zap,
+  Plus,
+  Check,
   Clock,
   ShieldCheck,
   BookmarkPlus
 } from 'lucide-react';
-import { 
-  BOARD_TEMPLATES, 
-  AGENT_TEMPLATES, 
-  CARD_TEMPLATES, 
-  WORKFLOW_TEMPLATES, 
-  ROUTINE_TEMPLATES, 
-  BoardTemplate 
+import {
+  BOARD_TEMPLATES,
+  AGENT_TEMPLATES,
+  CARD_TEMPLATES,
+  WORKFLOW_TEMPLATES,
+  ROUTINE_TEMPLATES,
+  BoardTemplate
 } from '../data/templates';
-import { BoardData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface BoardTemplateModalProps {
   isOpen: boolean;
@@ -218,12 +213,11 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/10">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-lg shadow-indigo-500/30">
+            <div className="p-2.5 rounded-xl bg-accent text-white">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -245,7 +239,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                   onClose();
                   onOpenSaveTemplateModal();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-indigo-500/20 border border-white/10 transition-all"
+                className="px-3 py-1.5 rounded-xl bg-accent hover:bg-accent-hi text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
                 title="Save current board state as a new reusable template"
               >
                 <BookmarkPlus className="w-4 h-4 text-indigo-200" />
@@ -349,7 +343,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                         </div>
                         <div>
                           <h3 className="text-sm font-bold text-slate-100">{tpl.name}</h3>
-                          <span className="text-[10px] text-indigo-300 font-mono">{tpl.category}</span>
+                          <span className="text-xs text-indigo-300 font-mono">{tpl.category}</span>
                         </div>
                       </div>
                       {isSelected && (
@@ -365,7 +359,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
 
                     <div className="flex flex-wrap gap-1 pt-1">
                       {tpl.tags.map(tag => (
-                        <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
+                        <span key={tag} className="text-xs px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
                           #{tag}
                         </span>
                       ))}
@@ -385,7 +379,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-base font-bold text-slate-100">{selectedTemplate.name}</h3>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono border border-purple-500/30">
+                      <span className="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono border border-purple-500/30">
                         {selectedTemplate.lists.length} Lists
                       </span>
                     </div>
@@ -403,11 +397,11 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                         <div className="flex items-center gap-2.5">
                           <span className="w-2 h-2 rounded-full bg-indigo-400" />
                           <span className="font-semibold text-slate-200">{list.title}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono capitalize">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono capitalize">
                             {list.listType.replace('_', ' ')}
                           </span>
                         </div>
-                        <span className="text-slate-400 font-mono text-[11px]">
+                        <span className="text-slate-400 font-mono text-xs">
                           {list.cards.length} Initial Cards
                         </span>
                       </div>
@@ -422,12 +416,12 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                   className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 font-medium text-xs transition-all flex items-center justify-center gap-2"
                 >
                   <span>Apply to Current Board</span>
-                  <span className="text-[10px] opacity-70 truncate max-w-[120px]">({activeBoardName})</span>
+                  <span className="text-xs opacity-70 truncate max-w-[120px]">({activeBoardName})</span>
                 </button>
 
                 <button
                   onClick={() => onSelectTemplate(selectedTemplate, 'create_new')}
-                  className="w-full sm:w-auto px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs shadow-lg shadow-indigo-500/25 border border-white/10 transition-all flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create New Board from Template</span>
@@ -449,13 +443,13 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-100">{agent.name}</h3>
-                      <span className="text-[10px] text-purple-300 font-mono">{agent.role}</span>
+                      <span className="text-xs text-purple-300 font-mono">{agent.role}</span>
                     </div>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">{agent.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {agent.capabilities.map(c => (
-                      <span key={c} className="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                      <span key={c} className="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
                         {c}
                       </span>
                     ))}
@@ -486,16 +480,16 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-100">{wf.name}</h3>
-                      <span className="text-[10px] text-cyan-300 font-mono">{wf.category} Pipeline</span>
+                      <span className="text-xs text-cyan-300 font-mono">{wf.category} Pipeline</span>
                     </div>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">{wf.description}</p>
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pipeline Stages:</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pipeline Stages:</span>
                     {wf.stages.map((st, i) => (
                       <div key={i} className="text-xs text-slate-300 bg-white/5 p-1.5 rounded border border-white/5 flex items-center justify-between">
                         <span>{st.title}</span>
-                        <span className="text-[10px] text-cyan-300 font-mono">{st.listType}</span>
+                        <span className="text-xs text-cyan-300 font-mono">{st.listType}</span>
                       </div>
                     ))}
                   </div>
@@ -525,7 +519,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-100">{card.name}</h3>
-                      <span className="text-[10px] text-emerald-300 font-mono capitalize">Entity: {card.entityType}</span>
+                      <span className="text-xs text-emerald-300 font-mono capitalize">Entity: {card.entityType}</span>
                     </div>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">{card.description}</p>
@@ -555,7 +549,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-slate-100">{rt.name}</h3>
-                      <span className="text-[10px] text-amber-300 font-mono">{rt.triggerInterval}</span>
+                      <span className="text-xs text-amber-300 font-mono">{rt.triggerInterval}</span>
                     </div>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">{rt.description}</p>
@@ -572,8 +566,7 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
             ))}
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 };
 

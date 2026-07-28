@@ -1,23 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { 
-  Plus, 
-  MessageSquare, 
-  Bot, 
-  User, 
-  Users, 
-  Zap, 
-  Workflow, 
-  Settings, 
-  Send, 
-  Mic, 
-  MicOff, 
-  Paperclip, 
-  GitFork, 
-  MoreVertical,
-  CheckCircle2,
+import {
+  Plus,
+  MessageSquare,
+  Bot,
+  User,
+  Zap,
+  Workflow,
+  Settings,
+  Send,
+  Mic,
+  MicOff,
+  GitFork,
   Trash2,
-  LayoutGrid,
-  Columns
+  LayoutGrid
 } from 'lucide-react';
 import { CardItemData, ListConfig, ListType, RBACRole } from '../types';
 import { CardItem } from './CardItem';
@@ -244,7 +239,7 @@ export const ListColumn: React.FC<ListColumnProps> = ({
             <h3 className="text-xs font-bold text-slate-200 truncate">
               {list.title}
             </h3>
-            <span className="text-[11px] px-2 py-0.2 rounded-full bg-slate-800 font-mono text-slate-300 font-medium border border-slate-700/60" title={`${list.cards.length} cards`}>
+            <span className="text-xs px-2 py-0.2 rounded-full bg-slate-800 font-mono text-slate-300 font-medium border border-slate-700/60" title={`${list.cards.length} cards`}>
               {list.cards.length}
             </span>
           </div>
@@ -297,7 +292,7 @@ export const ListColumn: React.FC<ListColumnProps> = ({
 
         {/* Sub-Badges & Router Status */}
         {(list.autoSortByPriority || list.feedForwardTargetBoardId) && (
-          <div className="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+          <div className="flex items-center justify-between text-xs text-slate-400 pt-0.5">
             <div className="flex items-center gap-2">
               {list.autoSortByPriority && (
                 <span className="font-mono text-slate-400">Auto-Sorted</span>
@@ -360,7 +355,7 @@ export const ListColumn: React.FC<ListColumnProps> = ({
             <button
               onClick={isRecording ? handleStopMic : handleStartMic}
               className={`p-1.5 rounded-lg transition-colors ${
-                isRecording ? 'bg-rose-600 text-white animate-pulse' : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60'
+                isRecording ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60'
               }`}
               title={isRecording ? 'Stop Recording' : 'Record voice message'}
             >

@@ -1,25 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Mic, 
-  MicOff, 
-  X, 
-  Sparkles, 
-  Volume2, 
-  Zap, 
-  CheckCircle2, 
-  PlusCircle, 
-  Search, 
-  BarChart3, 
-  Layout, 
-  GitFork, 
+import {
+  Mic,
+  X,
+  Volume2,
+  CheckCircle2,
+  PlusCircle,
+  Search,
+  BarChart3,
+  Layout,
   Archive,
-  Command,
   ArrowRight,
   Lightbulb,
-  HelpCircle,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import { Modal } from './ui/Modal';
 
 interface VoiceActionModalProps {
   isOpen: boolean;
@@ -155,19 +150,17 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10">
-        
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-xl">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-2xl ${isListening ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'}`}>
+            <div className={`p-2.5 rounded-2xl ${isListening ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'}`}>
               <Mic className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <span>Voice-to-Action Listener</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono border border-cyan-500/30">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono border border-cyan-500/30">
                   AI Speech Engine
                 </span>
               </h2>
@@ -199,7 +192,7 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
                   <h3 className="text-xs font-bold text-slate-100 flex items-center gap-2">
                     <span>Voice Command Tips & Hints</span>
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-xs text-slate-400">
                     {showTipOverlay ? 'Click any command below to test or speak it out loud:' : 'Click to show supported speech syntax...'}
                   </p>
                 </div>
@@ -216,48 +209,48 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
                   onClick={() => handleProcessCommand('Create a new feature request card')}
                   className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
                 >
-                  <span className="font-mono text-indigo-300 text-[11px]">"Create [title] card"</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300">Try it →</span>
+                  <span className="font-mono text-indigo-300 text-xs">"Create [title] card"</span>
+                  <span className="text-xs text-slate-400 group-hover:text-indigo-300">Try it →</span>
                 </div>
 
                 <div 
                   onClick={() => handleProcessCommand('Move task card to completed')}
                   className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
                 >
-                  <span className="font-mono text-indigo-300 text-[11px]">"Move card to [status]"</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300">Try it →</span>
+                  <span className="font-mono text-indigo-300 text-xs">"Move card to [status]"</span>
+                  <span className="text-xs text-slate-400 group-hover:text-indigo-300">Try it →</span>
                 </div>
 
                 <div 
                   onClick={() => handleProcessCommand('Open telemetry analytics dashboard')}
                   className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
                 >
-                  <span className="font-mono text-indigo-300 text-[11px]">"Open analytics"</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300">Try it →</span>
+                  <span className="font-mono text-indigo-300 text-xs">"Open analytics"</span>
+                  <span className="text-xs text-slate-400 group-hover:text-indigo-300">Try it →</span>
                 </div>
 
                 <div 
                   onClick={() => handleProcessCommand('Open global search modal')}
                   className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
                 >
-                  <span className="font-mono text-indigo-300 text-[11px]">"Open search"</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300">Try it →</span>
+                  <span className="font-mono text-indigo-300 text-xs">"Open search"</span>
+                  <span className="text-xs text-slate-400 group-hover:text-indigo-300">Try it →</span>
                 </div>
 
                 <div 
                   onClick={() => handleProcessCommand('Run auto archive inactive completed cards')}
                   className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
                 >
-                  <span className="font-mono text-indigo-300 text-[11px]">"Run auto archive"</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300">Try it →</span>
+                  <span className="font-mono text-indigo-300 text-xs">"Run auto archive"</span>
+                  <span className="text-xs text-slate-400 group-hover:text-indigo-300">Try it →</span>
                 </div>
 
                 <div 
                   onClick={() => handleProcessCommand('Open board template library')}
                   className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-200 cursor-pointer flex items-center justify-between group transition-colors"
                 >
-                  <span className="font-mono text-indigo-300 text-[11px]">"Open template library"</span>
-                  <span className="text-[10px] text-slate-400 group-hover:text-indigo-300">Try it →</span>
+                  <span className="font-mono text-indigo-300 text-xs">"Open template library"</span>
+                  <span className="text-xs text-slate-400 group-hover:text-indigo-300">Try it →</span>
                 </div>
               </div>
             )}
@@ -267,10 +260,10 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
           <div className="relative flex flex-col items-center justify-center py-4">
             <button
               onClick={toggleListening}
-              className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
-                isListening 
-                  ? 'bg-gradient-to-r from-rose-500 via-red-600 to-amber-500 text-white scale-110 shadow-rose-500/50 ring-4 ring-rose-500/30 animate-pulse'
-                  : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 text-white hover:scale-105 shadow-indigo-500/40'
+              className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+                isListening
+                  ? 'bg-err text-white scale-110'
+                  : 'bg-accent text-white hover:scale-105'
               }`}
             >
               {isListening ? (
@@ -287,7 +280,7 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
                   key={i}
                   style={{ height: `${height}%` }}
                   className={`w-1.5 rounded-full transition-all duration-100 ${
-                    isListening ? 'bg-gradient-to-t from-indigo-500 to-cyan-400' : 'bg-slate-700'
+                    isListening ? 'bg-accent' : 'bg-slate-700'
                   }`}
                 />
               ))}
@@ -300,9 +293,9 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
 
           {/* Real-time Transcription Box */}
           <div className="w-full p-4 rounded-2xl bg-white/5 border border-white/10 min-h-[70px] flex flex-col justify-center">
-            <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
+            <div className="text-xs font-mono text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
               <span>Speech Input Stream</span>
-              {transcript && <span className="text-indigo-400 font-semibold animate-pulse">Processing...</span>}
+              {transcript && <span className="text-indigo-400 font-semibold">Processing...</span>}
             </div>
             <div className="text-sm font-medium text-slate-100 font-mono italic">
               {transcript ? `"${transcript}"` : <span className="text-slate-500 font-sans not-italic">Say e.g. "Create a feature request card", "Open search", "Move card to completed", "Open analytics"...</span>}
@@ -311,7 +304,7 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
 
           {/* Action Execution Alert */}
           {lastActionStatus && (
-            <div className="w-full p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-2 animate-in fade-in duration-200">
+            <div className="w-full p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{lastActionStatus}</span>
             </div>
@@ -321,7 +314,7 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
           <div className="w-full space-y-2.5 pt-2 border-t border-white/10">
             <div className="text-xs font-bold text-slate-300 flex items-center justify-between">
               <span>Test Simulated Voice Commands</span>
-              <span className="text-[10px] font-mono text-slate-500">One-Tap Trigger</span>
+              <span className="text-xs font-mono text-slate-500">One-Tap Trigger</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -359,7 +352,6 @@ export const VoiceActionModal: React.FC<VoiceActionModalProps> = ({
           </button>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   );
 };

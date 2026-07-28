@@ -1,23 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { 
-  Plus, 
-  ChevronLeft, 
-  ChevronRight, 
-  Compass, 
-  Maximize2, 
-  Sparkles,
-  GitFork,
-  Filter,
-  X,
-  Tag,
-  Mic,
-  BarChart3,
-  Palette,
-  Archive,
-  Flame,
-  AlertTriangle,
-  Zap
-} from 'lucide-react';
 import { BoardData, CardItemData, ListConfig, RBACRole } from '../types';
 import { ListColumn } from './ListColumn';
 import { BOARD_THEMES, getTagStyle } from '../data/tagsAndThemes';
@@ -117,16 +98,6 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
     setIsPanning(false);
   };
 
-  const scrollToList = (index: number) => {
-    if (containerRef.current) {
-      const listWidth = 380;
-      containerRef.current.scrollTo({
-        left: index * listWidth,
-        behavior: 'smooth'
-      });
-    }
-  };
-
   const handleGuardedMoveCard = (cardId: string, sourceListId: string, targetListId: string) => {
     if (!onMoveCard) return;
 
@@ -206,24 +177,13 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
         }`}
         style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left', width: `${100 / zoomLevel}%` }}
       >
-        {/* Far Left Infinite Expansion Trigger */}
-        <div className="flex-shrink-0 self-center">
-          <button
-            onClick={() => onAddList('left')}
-            className="h-96 w-14 rounded-2xl border-2 border-dashed border-white/15 hover:border-indigo-400/50 hover:bg-white/10 backdrop-blur-sm text-slate-400 hover:text-indigo-300 flex flex-col items-center justify-center gap-2 transition-all group"
-          >
-            <Plus className="w-5 h-5 group-hover:scale-125 transition-transform" />
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider rotate-90">Left +1</span>
-          </button>
-        </div>
-
         {/* Board List Columns */}
         {processedLists.map((list) => {
           const vel = getListVelocity(list);
           return (
             <div key={list.id} className="relative group h-full flex flex-col min-h-0">
               {isHeatmapActive && (
-                <div className={`absolute -top-3 left-3 right-3 z-20 py-1 px-3 rounded-t-lg backdrop-blur-md text-[10px] font-bold font-mono text-white flex items-center justify-between border-t border-x shadow-lg transition-all ${vel.bg} ${vel.color}`}>
+                <div className={`absolute -top-3 left-3 right-3 z-20 py-1 px-3 rounded-t-lg backdrop-blur-md text-xs font-bold font-mono text-white flex items-center justify-between border-t border-x shadow-lg transition-all ${vel.bg} ${vel.color}`}>
                   <span>{vel.label}</span>
                   <span>{vel.score}% Velocity</span>
                 </div>
@@ -250,34 +210,6 @@ export const BoardCanvas: React.FC<BoardCanvasProps> = ({
             </div>
           );
         })}
-
-        {/* Far Right Infinite Expansion Trigger */}
-        <div className="flex-shrink-0 self-center">
-          <button
-            onClick={() => onAddList('right')}
-            className="h-96 w-14 rounded-2xl border-2 border-dashed border-white/15 hover:border-indigo-400/50 hover:bg-white/10 backdrop-blur-sm text-slate-400 hover:text-indigo-300 flex flex-col items-center justify-center gap-2 transition-all group"
-          >
-            <Plus className="w-5 h-5 group-hover:scale-125 transition-transform" />
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider -rotate-90">Right +1</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Lists Navigator Bottom Bar */}
-      <div className="px-4 py-2 bg-black/40 backdrop-blur-md border-t border-white/10 flex items-center text-xs text-slate-300">
-        <div className="flex items-center gap-2 overflow-x-auto py-0.5 w-full custom-scrollbar">
-          {board.lists.map((l, idx) => (
-            <button
-              key={l.id}
-              onClick={() => scrollToList(idx)}
-              className="px-3 py-1 rounded-xl bg-white/10 hover:bg-indigo-600/30 hover:border-indigo-400/40 border border-white/10 backdrop-blur-md text-slate-200 font-medium whitespace-nowrap transition-all flex items-center gap-1.5 shadow-sm shrink-0"
-            >
-              <span className="w-2 h-2 rounded-full bg-indigo-400" />
-              <span>{l.title}</span>
-              <span className="text-[10px] text-slate-400 font-mono">({l.cards.length})</span>
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

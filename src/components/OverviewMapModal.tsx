@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Network, Sparkles, Filter, Layers, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
+import { X, Network } from 'lucide-react';
 import * as d3 from 'd3';
 import { BoardData, CardItemData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface OverviewMapModalProps {
   isOpen: boolean;
@@ -231,12 +232,11 @@ export const OverviewMapModal: React.FC<OverviewMapModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-white/10 max-h-[92vh]">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl max-h-[92vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-lg shadow-indigo-500/30">
+            <div className="p-2.5 rounded-xl bg-accent text-white">
               <Network className="w-5 h-5" />
             </div>
             <div>
@@ -295,7 +295,7 @@ export const OverviewMapModal: React.FC<OverviewMapModalProps> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-2 text-indigo-300 font-mono text-[11px]">
+          <div className="flex items-center gap-2 text-indigo-300 font-mono text-xs">
             <span className="w-3 h-0.5 bg-indigo-400 inline-block" />
             <span>Arrow = Depends On Prerequisites</span>
           </div>
@@ -310,19 +310,18 @@ export const OverviewMapModal: React.FC<OverviewMapModalProps> = ({
             <div className="absolute bottom-4 left-4 p-3 rounded-xl bg-slate-900/95 border border-white/20 text-slate-100 shadow-2xl backdrop-blur-xl max-w-xs pointer-events-none space-y-1">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-bold text-sm text-indigo-300 truncate">{hoveredNode.title}</span>
-                <span className="text-[10px] uppercase px-1.5 py-0.5 rounded font-mono font-bold" style={{ backgroundColor: STATUS_COLORS[hoveredNode.status] + '33', color: STATUS_COLORS[hoveredNode.status] }}>
+                <span className="text-xs uppercase px-1.5 py-0.5 rounded font-mono font-bold" style={{ backgroundColor: STATUS_COLORS[hoveredNode.status] + '33', color: STATUS_COLORS[hoveredNode.status] }}>
                   {hoveredNode.status.replace('_', ' ')}
                 </span>
               </div>
               <p className="text-xs text-slate-300 line-clamp-2">{hoveredNode.cardData.description || 'No description'}</p>
-              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 font-mono">
+              <div className="flex items-center justify-between text-xs text-slate-400 pt-1 font-mono">
                 <span>List: {hoveredNode.listName}</span>
                 <span>Board: {hoveredNode.boardName}</span>
               </div>
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

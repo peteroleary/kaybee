@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  BarChart3, 
-  PieChart as PieIcon, 
-  TrendingUp, 
-  CheckCircle2, 
-  Bot, 
-  Layers, 
-  Zap, 
-  Activity, 
-  RefreshCw,
+import {
+  X,
+  BarChart3,
+  PieChart as PieIcon,
+  TrendingUp,
+  CheckCircle2,
+  Bot,
+  Layers,
+  Zap,
+  Activity,
   Sparkles,
   Filter
 } from 'lucide-react';
@@ -29,6 +28,7 @@ import {
   Legend 
 } from 'recharts';
 import { BoardData, CardItemData } from '../types';
+import { Modal } from './ui/Modal';
 
 interface AnalyticsDashboardModalProps {
   isOpen: boolean;
@@ -142,9 +142,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
   }));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl bg-slate-900/95 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ring-1 ring-white/10">
-        
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5 backdrop-blur-md">
           <div className="flex items-center gap-3">
@@ -203,7 +201,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
               </div>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-white font-mono">{totalCards}</span>
-                <span className="text-[10px] text-slate-400 font-mono">across lists</span>
+                <span className="text-xs text-slate-400 font-mono">across lists</span>
               </div>
             </div>
 
@@ -214,7 +212,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
               </div>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-emerald-400 font-mono">{completionPercentage}%</span>
-                <span className="text-[10px] text-emerald-300 font-mono">({completedCount} done)</span>
+                <span className="text-xs text-emerald-300 font-mono">({completedCount} done)</span>
               </div>
             </div>
 
@@ -227,7 +225,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
                 <span className="text-2xl font-black text-cyan-400 font-mono">
                   {entityStats.agent.completed + entityStats.routine.completed}
                 </span>
-                <span className="text-[10px] text-cyan-300 font-mono">agent ops</span>
+                <span className="text-xs text-cyan-300 font-mono">agent ops</span>
               </div>
             </div>
 
@@ -240,7 +238,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
                 <span className="text-2xl font-black text-purple-300 font-mono">
                   {activeBoard.lists.length}
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">in {activeBoard.name}</span>
+                <span className="text-xs text-slate-400 font-mono">in {activeBoard.name}</span>
               </div>
             </div>
           </div>
@@ -255,7 +253,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
                   <PieIcon className="w-4 h-4 text-indigo-400" />
                   <span>Card Status Distribution</span>
                 </h3>
-                <span className="text-[11px] font-mono text-slate-400">By State</span>
+                <span className="text-xs font-mono text-slate-400">By State</span>
               </div>
 
               <div className="h-64 w-full">
@@ -304,7 +302,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
                   <TrendingUp className="w-4 h-4 text-cyan-400" />
                   <span>Activity & Execution Velocity</span>
                 </h3>
-                <span className="text-[11px] font-mono text-slate-400">Weekly Pulse</span>
+                <span className="text-xs font-mono text-slate-400">Weekly Pulse</span>
               </div>
 
               <div className="h-64 w-full">
@@ -351,7 +349,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
                   <Bot className="w-4 h-4 text-purple-400" />
                   <span>Task Completion Rates by Entity Type</span>
                 </h3>
-                <span className="text-[11px] font-mono text-slate-400 font-semibold">Active vs Done</span>
+                <span className="text-xs font-mono text-slate-400 font-semibold">Active vs Done</span>
               </div>
 
               <div className="h-64 w-full">
@@ -390,7 +388,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
                   <Zap className="w-4 h-4 text-amber-400" />
                   <span>Active Board List Workload</span>
                 </h3>
-                <span className="text-[11px] font-mono text-amber-300 capitalize">{activeBoard.name}</span>
+                <span className="text-xs font-mono text-amber-300 capitalize">{activeBoard.name}</span>
               </div>
 
               <div className="h-64 w-full">
@@ -421,19 +419,18 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
 
         {/* Footer */}
         <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between text-xs text-slate-400">
-          <div className="flex items-center gap-2 font-mono text-[11px]">
-            <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <Sparkles className="w-4 h-4 text-amber-400" />
             <span>Telemetry automatically synchronized across human-agent swarm actions</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 transition-all"
+            className="px-4 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-medium text-xs transition-colors"
           >
             Close Dashboard
           </button>
         </div>
 
-      </div>
-    </div>
+    </Modal>
   );
 };

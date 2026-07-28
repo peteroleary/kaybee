@@ -82,11 +82,11 @@ export const TimeLoggerWidget: React.FC<TimeLoggerWidgetProps> = ({
     <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-3 backdrop-blur-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
-          <Clock className={`w-4 h-4 ${isRunning ? 'text-emerald-400 animate-pulse' : 'text-indigo-400'}`} />
+          <Clock className={`w-4 h-4 ${isRunning ? 'text-emerald-400' : 'text-indigo-400'}`} />
           <span>Time Logger & Work Session</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+          <span className="text-xs font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
             Total: {formatTime(totalLoggedSec)}
           </span>
           <button
@@ -155,12 +155,12 @@ export const TimeLoggerWidget: React.FC<TimeLoggerWidgetProps> = ({
       {showHistory && card.timeLogs && card.timeLogs.length > 0 && (
         <div className="space-y-1.5 pt-2 border-t border-white/10 max-h-32 overflow-y-auto custom-scrollbar">
           {card.timeLogs.map(log => (
-            <div key={log.id} className="p-2 rounded bg-white/5 border border-white/5 flex items-center justify-between text-[11px]">
+            <div key={log.id} className="p-2 rounded bg-white/5 border border-white/5 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 truncate">
                 <span className="font-mono text-emerald-400 font-bold">{formatTime(log.durationSeconds)}</span>
                 <span className="text-slate-300 truncate">{log.description}</span>
               </div>
-              <span className="text-slate-500 font-mono text-[10px] shrink-0">{log.loggedAt}</span>
+              <span className="text-slate-500 font-mono text-xs shrink-0">{log.loggedAt}</span>
             </div>
           ))}
         </div>
