@@ -18,6 +18,43 @@ export type HomogenousType = 'humans_only' | 'agents_only' | 'none';
 
 export type RBACRole = 'admin' | 'contributor' | 'ai_operator' | 'viewer';
 
+// Goal-Oriented Types
+export interface UserGoal {
+  id: string;
+  title: string;
+  description: string;
+  outcome: string; // What success looks like
+  status: 'active' | 'completed' | 'archived';
+  createdAt: string;
+  updatedAt: string;
+  boardIds: string[]; // Associated boards
+  progress: number; // 0-100
+  decomposedLists?: any[]; // AI-generated list structure
+  assignedAgentTypes?: string[];
+}
+
+// Autonomous Agent Types
+export type AgentCapability = 
+  | 'code_quality' 
+  | 'testing' 
+  | 'documentation' 
+  | 'security' 
+  | 'deployment'
+  | 'analysis'
+  | 'communication';
+
+export interface AgentDefinition {
+  id: string;
+  name: string;
+  type: EntityType;
+  capabilities: AgentCapability[];
+  status: 'idle' | 'busy' | 'offline';
+  avatar?: string;
+  description?: string;
+  autoExecute: boolean;
+  lastExecutionAt?: string;
+}
+
 export type WidgetType = 
   | 'toggle' 
   | 'slider' 

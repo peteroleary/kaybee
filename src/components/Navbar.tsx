@@ -64,6 +64,7 @@ interface NavbarProps {
   onResetPan: () => void;
   onToggleActivity: () => void;
   activityCount: number;
+  onOpenGoalCanvas?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -96,7 +97,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onChangeZoom,
   onResetPan,
   onToggleActivity,
-  activityCount
+  activityCount,
+  onOpenGoalCanvas
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
@@ -262,8 +264,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           title="AI Orchestrator Routine Engine (Gemini)"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>AI Orchestrator</span>
+          <span className="hidden lg:inline">AI Orchestrator</span>
         </button>
+
+        {/* Goal Canvas Button - Primary Action for Goal-Oriented UX */}
+        {onOpenGoalCanvas && (
+          <button
+            onClick={onOpenGoalCanvas}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition-colors"
+            title="Goal Canvas: Define outcomes and let agents execute autonomously"
+          >
+            <Target className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Goals</span>
+          </button>
+        )}
 
         {/* Board Router / Interconnect Trigger */}
         <button

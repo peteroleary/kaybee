@@ -16,11 +16,12 @@ import { AutoArchiveModal } from './components/AutoArchiveModal';
 import { OverviewMapModal } from './components/OverviewMapModal';
 import { TagManagerModal } from './components/TagManagerModal';
 import { SaveTemplateModal } from './components/SaveTemplateModal';
+import { GoalCanvasModal } from './components/GoalCanvasModal';
 import { toPng } from 'html-to-image';
 import { INITIAL_BOARDS } from './data/initialData';
 import { BOARD_TEMPLATES, BoardTemplate } from './data/templates';
-import { BoardData, CardItemData, ListConfig, RBACRole, ActivityLog, FeedForwardConnection } from './types';
-import { Plus, X, Layers, Cpu } from 'lucide-react';
+import { BoardData, CardItemData, ListConfig, RBACRole, ActivityLog, FeedForwardConnection, UserGoal } from './types';
+import { Plus, X, Layers, Cpu, Target } from 'lucide-react';
 
 export default function App() {
   const [boards, setBoards] = useState<BoardData[]>(INITIAL_BOARDS);
@@ -43,6 +44,15 @@ export default function App() {
   const [overviewMapOpen, setOverviewMapOpen] = useState(false);
   const [tagManagerModalOpen, setTagManagerModalOpen] = useState(false);
   const [saveTemplateModalOpen, setSaveTemplateModalOpen] = useState(false);
+  const [goalCanvasOpen, setGoalCanvasOpen] = useState(false);
+  const [goals, setGoals] = useState<UserGoal[]>(() => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('evo_kanban_goals') : null;
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [customTemplates, setCustomTemplates] = useState<BoardTemplate[]>(() => {
     try {
       const saved = typeof window !== 'undefined' ? localStorage.getItem('evo_kanban_custom_templates') : null;
@@ -61,6 +71,58 @@ export default function App() {
       return updated;
     });
     logActivity(`Saved current board snapshot as custom template: "${newTemplate.name}"`);
+  };
+
+  // Goal Management Handlers
+  const handleSaveGoal = (goal: UserGoal) => {
+    setGoals(prev => {
+      const existingIndex = prev.findIndex(g => g.id === goal.id);
+      let updated: UserGoal[];
+      if (existingIndex >= 0) {
+        updated = [...prev.slice(0, existingIndex), goal, ...prev.slice(existingIndex + 1)];
+      } else {
+        updated = [goal, ...prev];
+      }
+      try {
+        localStorage.setItem('evo_kanban_goals', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    logActivity(`Goal ${goals.find(g => g.id === goal.id) ? 'updated' : 'created'}: "${goal.title}"`);
+  };
+
+  const handleDeleteGoal = (goalId: string) => {
+    setGoals(prev => {
+      const updated = prev.filter(g => g.id !== goalId);
+      try {
+        localStorage.setItem('evo_kanban_goals', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    logActivity('Deleted goal');
+  };
+
+  const handleDecomposeGoal = (goal: UserGoal) => {
+    // This is called after AI decomposition - apply the lists to the board
+    if (goal.decomposedLists && goal.decomposedLists.length > 0) {
+      setBoards(prev => prev.map(b => {
+        if (b.id !== activeBoardId) return b;
+        const newLists = goal.decomposedLists!.map((nl: any, idx: number) => ({
+          ...nl,
+          id: `goal-list-${Date.now()}-${idx}`,
+          cards: (nl.cards || []).map((c: any, cIdx: number) => ({
+            ...c,
+            id: `goal-card-${Date.now()}-${cIdx}`,
+            createdAt: 'Just now',
+            updatedAt: 'Just now',
+            widgets: [],
+            subtasks: []
+          }))
+        }));
+        return { ...b, lists: [...b.lists, ...newLists] };
+      }));
+      logActivity(`Decomposed goal "${goal.title}" into ${goal.decomposedLists.length} lists with autonomous tasks`);
+    }
   };
   const [customTagColors, setCustomTagColors] = useState<Record<string, string>>(() => {
     try {
@@ -930,6 +992,7 @@ export default function App() {
           onResetPan={() => setZoomLevel(1.0)}
           onToggleActivity={() => setActivityOpen(!activityOpen)}
           activityCount={activities.length}
+          onOpenGoalCanvas={() => setGoalCanvasOpen(true)}
         />
 
         {/* Section 2: Main Infinite Board Canvas */}

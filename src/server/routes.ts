@@ -1,5 +1,5 @@
 import express from "express";
-import { callOrchestrator, callTranscribe, callAgentRun, callSmartSuggestions } from "./api/gemini.js";
+import { callOrchestrator, callTranscribe, callAgentRun, callSmartSuggestions, callGoalDecomposition } from "./api/gemini.js";
 
 const router = express.Router();
 
@@ -8,6 +8,26 @@ router.use(express.json({ limit: "10mb" }));
 // Health Check Endpoint
 router.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Goal Decomposition Endpoint (NEW - for Goal-Oriented UX)
+router.post("/goal-decompose", async (req, res) => {
+  try {
+    const { goal, currentBoard } = req.body;
+
+    if (!goal || !goal.title) {
+      return res.status(400).json({ error: "Goal with title is required" });
+    }
+
+    const result = await callGoalDecomposition(goal, currentBoard);
+    return res.json(result);
+  } catch (error: any) {
+    console.error("Goal decomposition error:", error);
+    return res.status(500).json({
+      error: "Failed to decompose goal",
+      details: error.message || "Internal server error"
+    });
+  }
 });
 
 // Orchestrator AI Endpoint
