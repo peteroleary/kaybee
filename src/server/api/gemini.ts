@@ -33,6 +33,25 @@ export interface OrchestratorResponse {
   }>;
 }
 
+export interface GoalDecompositionResponse {
+  summary: string;
+  newLists: Array<{
+    title: string;
+    listType: string;
+    homogenousType?: string;
+    color: string;
+    cards: Array<{
+      title: string;
+      description: string;
+      entityType: string;
+      priority: string;
+      tags: string[];
+      assignedAgentType?: string;
+    }>;
+  }>;
+  suggestedAgents: string[];
+}
+
 export interface SmartSuggestionResponse {
   summary: string;
   suggestedSubtasks: Array<{ id: string; text: string; completed: boolean }>;
@@ -296,4 +315,100 @@ Existing Tags: ${JSON.stringify(tags || [])}`,
     suggestedWidgets: parsedData.suggestedWidgets || [],
     suggestedWorkflow: parsedData.suggestedWorkflow || null
   };
+}
+
+export async function callGoalDecomposition(
+  goal: { title: string; description: string; outcome: string },
+  currentBoard?: any
+): Promise<GoalDecompositionResponse> {
+  const ai = getGeminiClient();
+
+  if (!ai) {
+    // Fallback: Create basic list structure based on goal
+    return {
+      summary: `Decomposed goal "${goal.title}" into actionable lists and tasks`,
+      newLists: [
+        {
+          title: "Planning & Research",
+          listType: "kanban",
+          color: "indigo",
+          cards: [
+            {
+              title: `Research: ${goal.title}`,
+              description: "Gather requirements and research best practices",
+              entityType: "task",
+              priority: "high",
+              tags: ["Planning", "Research"]
+            }
+          ]
+        },
+        {
+          title: "Development",
+          listType: "kanban",
+          color: "emerald",
+          cards: [
+            {
+              title: `Implement: ${goal.title}`,
+              description: "Core development work",
+              entityType: "agent",
+              priority: "high",
+              tags: ["Development", "Auto-Assigned"],
+              assignedAgentType: "code_quality"
+            }
+          ]
+        },
+        {
+          title: "Testing & QA",
+          listType: "kanban",
+          color: "amber",
+          cards: [
+            {
+              title: `Test: ${goal.title}`,
+              description: "Automated and manual testing",
+              entityType: "agent",
+              priority: "medium",
+              tags: ["QA", "Testing"],
+              assignedAgentType: "testing"
+            }
+          ]
+        }
+      ],
+      suggestedAgents: ["code_quality", "testing", "documentation"]
+    };
+  }
+
+  const systemInstruction = `You are the Goal Decomposition Agent for KB3.0 Kanban Board.
+Your job is to break down high-level user goals into actionable lists and tasks that can be autonomously executed by AI agents.
+
+Given a goal with title, description, and desired outcome, return a structured JSON object containing:
+1. "summary": Brief explanation of the decomposition strategy
+2. "newLists": Array of 3-5 lists representing workflow stages (e.g., Planning, Development, Testing, Deployment)
+   - Each list should have: title, listType ("kanban"), color, and 2-4 cards
+3. "suggestedAgents": Array of agent capability types needed (from: "code_quality", "testing", "documentation", "security", "deployment", "analysis", "communication")
+
+Each card in the lists should have:
+- title: Action-oriented task name
+- description: What needs to be done
+- entityType: "task", "human", or "agent"
+- priority: "low", "medium", "high", or "urgent"
+- tags: Relevant tags
+- assignedAgentType: (optional) Which agent capability should handle this
+
+Always return valid JSON matching this schema.`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3.6-flash",
+    contents: `Goal Title: "${goal.title}"
+Goal Description: "${goal.description}"
+Desired Outcome: "${goal.outcome}"
+
+Current Board Context: ${currentBoard ? JSON.stringify({ name: currentBoard.name, existingLists: currentBoard.lists?.length }) : 'No board context'}`,
+    config: {
+      systemInstruction,
+      responseMimeType: "application/json",
+    },
+  });
+
+  const responseText = response.text || "{}";
+  return JSON.parse(responseText);
 }
