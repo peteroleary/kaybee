@@ -39,8 +39,9 @@ All real backend logic (AI calls) lives under `src/server/`, mounted by the sing
 
 ### Frontend: board state and data model
 
-- `src/App.tsx` is the main application shell (large, ~1200 lines) — it composes the board canvas, navbar, and the various feature modals.
-- `src/hooks/useBoardState.ts` is the central state hook: board/list/card CRUD, card movement, activity logging, and feed-forward triggers between boards. UI components should delegate state mutation here rather than manipulating board data directly.
+- `src/App.tsx` is the thin application shell (~100 lines) — it renders `Navbar`, `BoardCanvas`, `ModalHost`, and `ActivityDrawer`, wiring their props from `useWorkspace()` / `useUiState()`. It holds no state of its own.
+- `src/state/WorkspaceProvider.tsx` is the central state hook: board/list/card CRUD, card movement, activity logging, goals, templates, tag colors, and feed-forward triggers between boards. UI components should delegate state mutation here (via `useWorkspace()`) rather than manipulating board data directly. `src/state/UiStateProvider.tsx` (via `useUiState()`) owns all modal open/close state, zoom, and board-view filters. `src/hooks/useBoardState.ts` no longer exists — it was a dead, unused duplicate of this logic and has been deleted.
+- `src/lib/repository/` defines the `WorkspaceRepository` interface and an in-memory implementation (`memoryRepository.ts`) that a later phase will wire `WorkspaceProvider` up to (and eventually swap for a Firestore-backed implementation once auth-gating lands); `WorkspaceProvider` does not consume it for mutations yet.
 - `src/types.ts` defines the core data model, read this before touching board/card logic:
   - `BoardData` → `ListConfig[]` → `CardItemData[]`
   - `EntityType` distinguishes `task | human | agent | routine | human_team | agent_swarm | troop` cards
