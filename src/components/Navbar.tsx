@@ -24,6 +24,7 @@ import {
   Tag,
   BookmarkPlus,
   X,
+  Target,
   LogIn,
   LogOut,
   User as UserIcon
