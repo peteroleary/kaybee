@@ -1023,8 +1023,18 @@ export default function App() {
           onUpdateCard={handleUpdateCard}
         />
 
-
       </div>
+
+      {/* Goal Canvas Modal for Goal-Oriented UX */}
+      <GoalCanvasModal
+        isOpen={goalCanvasOpen}
+        onClose={() => setGoalCanvasOpen(false)}
+        goals={goals}
+        onSaveGoal={handleSaveGoal}
+        onDeleteGoal={handleDeleteGoal}
+        onDecomposeGoal={handleDecomposeGoal}
+        boards={boards}
+      />
 
       {/* AI Orchestrator Agent Modal */}
       <OrchestratorModal
