@@ -5,6 +5,7 @@ import { BoardCanvas } from './components/BoardCanvas';
 import { ActivityDrawer } from './components/ActivityDrawer';
 import { ModalHost } from './components/ModalHost';
 import { GoalHome } from './features/goals/GoalHome';
+import { GoalContextBar } from './features/goals/GoalContextBar';
 import { OrchestratorDock } from './features/orchestrator/OrchestratorDock';
 import { OrchestratorProvider } from './features/orchestrator/OrchestratorProvider';
 import { useWorkspace } from './state/WorkspaceProvider';
@@ -28,6 +29,11 @@ export default function App() {
   }, [workspace.goalsLoaded, workspace.goals, ui]);
 
   const boardVisible = ui.appMode === 'board' && !!workspace.activeBoard;
+  // A board is a view of the goal that owns it — surface that goal's context
+  // (progress, runs, thread) above the canvas whenever one does.
+  const activeGoal = boardVisible
+    ? workspace.goals.find(g => g.boardId === workspace.activeBoardId) ?? null
+    : null;
 
   return (
     <OrchestratorProvider>
@@ -79,6 +85,10 @@ export default function App() {
             onChangeRole={(role) => workspace.setCurrentRole(role)}
           />
         )}
+
+        {/* Section 1c: goal context — when the visible board belongs to a
+            goal, the goal's progress, runs, and thread ride above the canvas. */}
+        {activeGoal && <GoalContextBar goal={activeGoal} />}
 
         {/* Section 2: picks one of two surfaces — the goal-first home (no
             goals yet, no boards yet, or the user asked for it via the Goals
