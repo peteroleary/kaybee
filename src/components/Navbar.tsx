@@ -27,7 +27,8 @@ import {
   Target,
   LogIn,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  Bot
 } from 'lucide-react';
 import { BoardData, RBACRole } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -66,6 +67,7 @@ interface NavbarProps {
   onToggleActivity: () => void;
   activityCount: number;
   onOpenGoalCanvas?: () => void;
+  onOpenAgentRegistry?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -99,7 +101,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onResetPan,
   onToggleActivity,
   activityCount,
-  onOpenGoalCanvas
+  onOpenGoalCanvas,
+  onOpenAgentRegistry
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
@@ -278,6 +281,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Target className="w-3.5 h-3.5" />
             <span className="hidden lg:inline">Goals</span>
           </button>
+        )}
+
+        {/* Agent Registry Trigger */}
+        {onOpenAgentRegistry && (
+          <IconButton
+            onClick={onOpenAgentRegistry}
+            title="Agent Registry: Manage assignable agents and people"
+            aria-label="Agent Registry: Manage assignable agents and people"
+          >
+            <Bot className="w-3.5 h-3.5" />
+          </IconButton>
         )}
 
         {/* Board Router / Interconnect Trigger */}

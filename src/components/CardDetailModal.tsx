@@ -31,9 +31,12 @@ import {
   Send,
   CornerDownRight
 } from 'lucide-react';
-import { CardItemData, EntityType, InteractiveWidget, WidgetType, BoardData, CardComment } from '../types';
+import { CardItemData, EntityType, InteractiveWidget, WidgetType, BoardData, CardComment, CardDelegate } from '../types';
 import { TimeLoggerWidget } from './TimeLoggerWidget';
 import { Modal } from './ui/Modal';
+import { AgentPicker } from '../features/agents/AgentPicker';
+import { useAgents } from '../state/AgentProvider';
+import { AgentDoc } from '../lib/agents/types';
 
 interface CardDetailModalProps {
   card: CardItemData | null;
@@ -56,6 +59,7 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
 }) => {
   if (!isOpen || !card) return null;
 
+  const { agents } = useAgents();
   const [editedCard, setEditedCard] = useState<CardItemData>({ ...card });
   const [isRunning, setIsRunning] = useState(false);
   const [newSubtask, setNewSubtask] = useState('');
@@ -322,6 +326,24 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
     });
   };
 
+  const handleAssignAgent = (agent: AgentDoc | null) => {
+    const delegate: CardDelegate | undefined = agent
+      ? {
+          id: agent.id,
+          name: agent.name,
+          type: agent.entityType,
+          avatar: agent.avatar,
+          role: agent.kind === 'human' ? 'Human' : 'Agent',
+          status: agent.status,
+        }
+      : undefined;
+    setEditedCard({
+      ...editedCard,
+      assignedAgentId: agent?.id ?? null,
+      delegate,
+    });
+  };
+
   const handleRunTask = async () => {
     setIsRunning(true);
     await onRunAgentTask(editedCard);
@@ -457,6 +479,12 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Assigned Agent / Person */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned To</label>
+            <AgentPicker agents={agents} assignedAgentId={editedCard.assignedAgentId} onAssign={handleAssignAgent} />
           </div>
 
           {/* Description */}
