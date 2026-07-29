@@ -1,28 +1,13 @@
-import { collection, doc, runTransaction, serverTimestamp, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, doc, runTransaction, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase';
-import { BoardTemplate } from '../../data/templates';
-import { INITIAL_BOARDS } from '../../data/initialData';
 import { newId } from '../../shared/ids';
-import { BoardData, UserGoal } from '../../types';
+import { BoardData } from '../../types';
 import { chunk, stripUndefined } from './firestoreUtils';
 import { positionAtIndex } from './position';
-
-const GOALS_STORAGE_KEY = 'evo_kanban_goals';
-const TEMPLATES_STORAGE_KEY = 'evo_kanban_custom_templates';
-const TAG_COLORS_STORAGE_KEY = 'kb3_custom_tag_colors';
 
 export interface BootstrapResult {
   seeded: boolean;
   boardCount: number;
-}
-
-function readLocalJson<T>(key: string, fallback: T): T {
-  try {
-    const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
 }
 
 /**
@@ -56,15 +41,13 @@ async function claimSeeding(uid: string): Promise<boolean> {
   });
 }
 
-export async function bootstrapWorkspace(uid: string, seedBoards: BoardData[] = INITIAL_BOARDS): Promise<BootstrapResult> {
+export async function bootstrapWorkspace(uid: string, seedBoards: BoardData[] = []): Promise<BootstrapResult> {
   const claimed = await claimSeeding(uid);
   if (!claimed) return { seeded: false, boardCount: 0 };
 
   const boardsCol = collection(db, 'boards');
   const listsCol = collection(db, 'lists');
   const cardsCol = collection(db, 'cards');
-  const goalsCol = collection(db, 'goals');
-  const templatesCol = collection(db, 'templates');
 
   const ops: { ref: ReturnType<typeof doc>; data: Record<string, unknown> }[] = [];
 
@@ -116,27 +99,10 @@ export async function bootstrapWorkspace(uid: string, seedBoards: BoardData[] = 
     });
   });
 
-  const goals = readLocalJson<UserGoal[]>(GOALS_STORAGE_KEY, []);
-  goals.forEach(goal => {
-    const { id, ...rest } = goal;
-    ops.push({ ref: doc(goalsCol, id), data: stripUndefined({ ...rest, ownerUid: uid }) });
-  });
-
-  const templates = readLocalJson<BoardTemplate[]>(TEMPLATES_STORAGE_KEY, []);
-  templates.forEach(template => {
-    const { id, ...rest } = template;
-    ops.push({ ref: doc(templatesCol, id), data: stripUndefined({ ...rest, ownerUid: uid }) });
-  });
-
   for (const group of chunk(ops)) {
     const batch = writeBatch(db);
     group.forEach(op => batch.set(op.ref, op.data, { merge: true }));
     await batch.commit();
-  }
-
-  const tagColors = readLocalJson<Record<string, string>>(TAG_COLORS_STORAGE_KEY, {});
-  if (Object.keys(tagColors).length > 0) {
-    await setDoc(doc(db, 'users', uid), { tagColors }, { merge: true });
   }
 
   return { seeded: true, boardCount: seedBoards.length };

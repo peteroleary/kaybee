@@ -3,7 +3,6 @@ import { computeGoalProgress } from '../goals/progress';
 import { materializePlan, type NormalizeContext } from '../../shared/plan/normalize';
 import { PlanProposal } from '../../shared/contracts/goalPlan';
 import { ActivityLog, BoardData, CardItemData, ListConfig, UserGoal } from '../../types';
-import { INITIAL_BOARDS } from '../../data/initialData';
 import { ApplyPlanOptions, AppliedRefs, BoardSummary } from './types';
 import {
   CreateBoardInput,
@@ -16,16 +15,6 @@ import {
 const GOALS_STORAGE_KEY = 'evo_kanban_goals';
 const TEMPLATES_STORAGE_KEY = 'evo_kanban_custom_templates';
 const TAG_COLORS_STORAGE_KEY = 'kb3_custom_tag_colors';
-
-const SEED_ACTIVITY: ActivityLog[] = [
-  {
-    id: 'act-1',
-    timestamp: '10:45 AM',
-    actor: { name: 'Orchestrator Agent', isAgent: true },
-    action: 'Initialized KB3.0 Evolutionary Kanban Environment with 3 Boards',
-    boardName: 'KB3.0 Core Product Lab',
-  },
-];
 
 function loadJson<T>(key: string, fallback: T): T {
   try {
@@ -64,12 +53,12 @@ interface ListLocation {
   listIdx: number;
 }
 
-export function createMemoryRepository(seedBoards: BoardData[] = INITIAL_BOARDS): WorkspaceRepository {
+export function createMemoryRepository(seedBoards: BoardData[] = []): WorkspaceRepository {
   let boards: BoardData[] = seedBoards;
   let goals: UserGoal[] = loadJson<UserGoal[]>(GOALS_STORAGE_KEY, []);
   let templates: BoardTemplate[] = loadJson<BoardTemplate[]>(TEMPLATES_STORAGE_KEY, []);
   let tagColors: Record<string, string> = loadJson<Record<string, string>>(TAG_COLORS_STORAGE_KEY, {});
-  let activities: ActivityLog[] = SEED_ACTIVITY;
+  let activities: ActivityLog[] = [];
 
   const allBoardsSubs = new Set<(b: BoardData[]) => void>();
   const boardSummarySubs = new Set<(b: BoardSummary[]) => void>();

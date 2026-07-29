@@ -53,7 +53,7 @@ Multi-turn, context-carrying. Request body: `{threadId, message, context, histor
   - `EntityType` distinguishes `task | human | agent | routine | human_team | agent_swarm | troop` cards
   - `UserGoal` / `AgentDefinition` back the goal-oriented and autonomous-agent UX; `UserGoal.autonomy?: { enabled?: boolean } | null` is the per-goal autonomy override (set by the orchestrator's "Apply & Run"; `false` opts a goal out)
   - `FeedForwardConnection` models board-to-board automation
-- `src/data/` holds seed content: `initialData.ts` (default boards), `templates.ts` (board templates), `tagsAndThemes.ts` (theme tokens).
+- `src/data/` holds static content: `templates.ts` (board templates), `tagsAndThemes.ts` (theme tokens). There is no mock workspace seed — new workspaces start empty and `bootstrap.ts` only claims `users/{uid}.seededAt` (it no longer seeds boards or migrates localStorage data).
 - `src/components/` — generic chrome and modal components (`Navbar.tsx`, `BoardCanvas.tsx`, `CardDetailModal.tsx`, `AnalyticsDashboardModal.tsx`, `BoardInterconnectModal.tsx`, `VoiceActionModal.tsx`, etc.) plus `components/ui/` primitives. Feature-specific UI lives under `src/features/` (goals, agents, orchestrator, runs). Every component declares an explicit TypeScript props interface. Icons come from `lucide-react`.
 - `src/context/AuthContext.tsx` — Firebase Auth context (`user`, `loading`, `signInWithGoogle`, `signOutUser`), wraps the app in `src/main.tsx`.
 - `src/lib/firebase.ts` — Firebase Web SDK init; exports `app`, `auth`, `db`, `googleProvider`. Reads config from `import.meta.env.VITE_FIREBASE_*` (falls back to `NEXT_PUBLIC_FIREBASE_*`, then hardcoded defaults for project `kaybee-503713`).

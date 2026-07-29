@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { INITIAL_BOARDS } from '../data/initialData';
 import { BoardTemplate } from '../data/templates';
 import { applyGoalPlan } from '../lib/goals/applyPlan';
 import { apiPost } from '../lib/api/client';
@@ -111,16 +110,15 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [bootstrapping, setBootstrapping] = useState(false);
   const [boardsLoaded, setBoardsLoaded] = useState(false);
 
-  // Seeded synchronously with INITIAL_BOARDS (the memory repository's default)
-  // so the very first render matches today's behavior exactly — no flash
-  // before the subscription effect below fires.
-  const [boards, setBoards] = useState<BoardData[]>(INITIAL_BOARDS);
+  // Starts empty — the mock INITIAL_BOARDS seed is gone; the first render
+  // shows the goal-first home until the user creates a board or applies a plan.
+  const [boards, setBoards] = useState<BoardData[]>([]);
   const boardsRef = useRef<BoardData[]>(boards);
   useEffect(() => {
     boardsRef.current = boards;
   }, [boards]);
 
-  const [activeBoardId, setActiveBoardId] = useState<string>(INITIAL_BOARDS[0]?.id ?? '');
+  const [activeBoardId, setActiveBoardId] = useState<string>('');
   const [currentRole, setCurrentRole] = useState<RBACRole>('admin');
   const [goals, setGoals] = useState<UserGoal[]>([]);
   const [goalsLoaded, setGoalsLoaded] = useState(false);
@@ -141,7 +139,9 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setBootstrapping(true);
 
     const currentBoards = boardsRef.current;
-    const hasLocalEdits = JSON.stringify(currentBoards) !== JSON.stringify(INITIAL_BOARDS);
+    // Anything in the signed-out workspace is user-built (no mock seed), so
+    // offer to carry it into the account on first sign-in.
+    const hasLocalEdits = currentBoards.length > 0;
     let seedBoards: BoardData[] | undefined;
     if (hasLocalEdits && typeof window !== 'undefined') {
       const wantsImport = window.confirm(

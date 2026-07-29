@@ -70,11 +70,11 @@ export default function App() {
         />
 
         {/* Section 2: picks one of two surfaces — the goal-first home (no
-            goals yet, or the user asked for it via the Goals button) or the
-            board canvas — with the Orchestrator dock railed to the right of
-            either. No router: this is the entire "navigation". */}
+            goals yet, no boards yet, or the user asked for it via the Goals
+            button) or the board canvas — with the Orchestrator dock railed to
+            the right of either. No router: this is the entire "navigation". */}
         <div className="flex flex-1 overflow-hidden">
-          {ui.appMode === 'home' ? (
+          {ui.appMode === 'home' || !workspace.activeBoard ? (
             <GoalHome />
           ) : (
             <BoardCanvas
