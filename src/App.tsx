@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Navbar } from './components/Navbar';
+import { BoardToolbar } from './components/BoardToolbar';
 import { BoardCanvas } from './components/BoardCanvas';
 import { ActivityDrawer } from './components/ActivityDrawer';
 import { ModalHost } from './components/ModalHost';
@@ -26,11 +27,15 @@ export default function App() {
     if (workspace.goals.length === 0) ui.setAppMode('home');
   }, [workspace.goalsLoaded, workspace.goals, ui]);
 
+  const boardVisible = ui.appMode === 'board' && !!workspace.activeBoard;
+
   return (
     <OrchestratorProvider>
       <div className="relative flex flex-col h-screen w-screen bg-bg-0 font-sans text-fg overflow-hidden select-none">
       <div className="relative z-10 flex flex-col h-full w-full overflow-hidden">
-        {/* Section 1: Single Master Navbar */}
+        {/* Section 1: Global navbar — navigation + the agents-finish-goals
+            loop. Board-scoped actions live in the toolbar below, which only
+            exists while a board is visible. */}
         <Navbar
           boards={workspace.boards}
           activeBoardId={workspace.activeBoardId}
@@ -39,42 +44,48 @@ export default function App() {
             ui.setAppMode('board');
           }}
           onOpenOrchestrator={ui.toggleDock}
-          onOpenInterconnect={() => ui.openModal('interconnect')}
           onOpenNewBoard={() => ui.openModal('newBoard')}
           onOpenSearch={() => ui.openModal('search')}
-          onOpenTemplates={() => ui.openModal('boardTemplate')}
-          onOpenSaveTemplate={() => ui.openModal('saveTemplate')}
-          onOpenVoice={() => ui.openModal('voice')}
-          onOpenAnalytics={() => ui.openModal('analytics')}
-          onOpenOverviewMap={() => ui.openModal('overviewMap')}
-          onExportBoardImage={workspace.handleExportBoardImage}
-          smartFilterActive={ui.smartFilterActive}
-          onToggleSmartFilter={ui.toggleSmartFilter}
-          isHeatmapActive={ui.isHeatmapActive}
-          onToggleHeatmap={ui.toggleHeatmap}
-          onOpenThemeModal={() => ui.openModal('theme')}
-          onOpenAutoArchiveModal={() => ui.openModal('autoArchive')}
-          onAddList={() => workspace.handleAddList('right')}
-          selectedTagFilter={ui.selectedTagFilter}
-          onSelectTagFilter={(tag) => ui.setSelectedTagFilter(tag)}
-          onOpenTagManagerModal={() => ui.openModal('tagManager')}
-          currentRole={workspace.currentRole}
-          onChangeRole={(role) => workspace.setCurrentRole(role)}
-          zoomLevel={ui.zoomLevel}
-          onChangeZoom={(delta) => ui.changeZoom(delta)}
-          onResetPan={() => ui.resetZoom()}
           onToggleActivity={() => ui.toggleActivity()}
           activityCount={workspace.activities.length}
           onOpenGoalCanvas={() => ui.setAppMode('home')}
           onOpenAgentRegistry={() => ui.openModal('agentRegistry')}
         />
 
+        {/* Section 1b: board-context toolbar — only while a board is on
+            screen, so the goal-first home stays clean. */}
+        {boardVisible && (
+          <BoardToolbar
+            onAddList={() => workspace.handleAddList('right')}
+            isHeatmapActive={ui.isHeatmapActive}
+            onToggleHeatmap={ui.toggleHeatmap}
+            smartFilterActive={ui.smartFilterActive}
+            onToggleSmartFilter={ui.toggleSmartFilter}
+            selectedTagFilter={ui.selectedTagFilter}
+            onOpenTagManagerModal={() => ui.openModal('tagManager')}
+            onOpenOverviewMap={() => ui.openModal('overviewMap')}
+            onOpenInterconnect={() => ui.openModal('interconnect')}
+            onOpenAnalytics={() => ui.openModal('analytics')}
+            onOpenVoice={() => ui.openModal('voice')}
+            onOpenThemeModal={() => ui.openModal('theme')}
+            onOpenAutoArchiveModal={() => ui.openModal('autoArchive')}
+            onOpenTemplates={() => ui.openModal('boardTemplate')}
+            onOpenSaveTemplate={() => ui.openModal('saveTemplate')}
+            onExportBoardImage={workspace.handleExportBoardImage}
+            zoomLevel={ui.zoomLevel}
+            onChangeZoom={(delta) => ui.changeZoom(delta)}
+            onResetPan={() => ui.resetZoom()}
+            currentRole={workspace.currentRole}
+            onChangeRole={(role) => workspace.setCurrentRole(role)}
+          />
+        )}
+
         {/* Section 2: picks one of two surfaces — the goal-first home (no
             goals yet, no boards yet, or the user asked for it via the Goals
             button) or the board canvas — with the Orchestrator dock railed to
             the right of either. No router: this is the entire "navigation". */}
         <div className="flex flex-1 overflow-hidden">
-          {ui.appMode === 'home' || !workspace.activeBoard ? (
+          {!boardVisible ? (
             <GoalHome />
           ) : (
             <BoardCanvas
