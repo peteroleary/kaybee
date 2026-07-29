@@ -51,9 +51,10 @@ async function buildHeaders(idempotencyKey: string | undefined, forceRefresh: bo
  * where a cached token expired mid-session. Throws `ApiClientError` (with
  * the HTTP status attached) for any other non-2xx response.
  *
- * Nothing calls this yet: existing components (`OrchestratorModal`,
- * `GoalCanvasModal`, `CardDetailModal`, `ListColumn`, `App.tsx`) still use
- * bare `fetch('/api/...')`. A later phase migrates those call sites here.
+ * Nothing calls this yet: existing call sites (`OrchestratorModal`,
+ * `CardDetailModal`, `ListColumn`, `WorkspaceProvider`) still use bare
+ * `fetch('/api/...')`. The autonomy phase migrates them here when it flips
+ * AUTH_REQUIRED=true.
  */
 export async function apiPost<T>(path: string, body: unknown, opts?: ApiPostOptions): Promise<T> {
   const idempotencyKey = opts?.idempotencyKey;

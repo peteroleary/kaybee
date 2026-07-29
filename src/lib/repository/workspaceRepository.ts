@@ -1,4 +1,5 @@
 import { BoardTemplate } from '../../data/templates';
+import { PlanProposal } from '../../shared/contracts/goalPlan';
 import {
   ActivityLog,
   BoardData,
@@ -6,7 +7,7 @@ import {
   ListConfig,
   UserGoal,
 } from '../../types';
-import { BoardPatch, BoardSummary, CardPatch, ListPatch } from './types';
+import { ApplyPlanOptions, AppliedRefs, BoardPatch, BoardSummary, CardPatch, ListPatch } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -66,6 +67,15 @@ export interface WorkspaceRepository {
 
   saveGoal(goal: UserGoal): Promise<string>;
   deleteGoal(goalId: string): Promise<void>;
+  /**
+   * Materializes a persisted PlanProposal (via shared/plan/normalize's
+   * materializePlan) into real lists/cards on `opts.boardId`, writing them in
+   * as few batches as Firestore's 500-op batch cap allows. Pure creation —
+   * never mutates existing lists/cards, and never touches the goal doc
+   * itself (callers are responsible for persisting planStatus/appliedRefs —
+   * see src/lib/goals/applyPlan.ts).
+   */
+  applyPlan(plan: PlanProposal, opts: ApplyPlanOptions): Promise<AppliedRefs>;
 
   saveTemplate(template: BoardTemplate): Promise<string>;
   updateTagColor(tag: string, colorKey: string): Promise<void>;

@@ -1,4 +1,6 @@
 import type { AgentCapabilityId } from './shared/agentCapabilities';
+import type { PlanProposal } from './shared/contracts/goalPlan';
+import type { GoalProgress } from './lib/goals/progress';
 
 export type EntityType =
   | 'task' 
@@ -29,8 +31,23 @@ export interface UserGoal {
   status: 'active' | 'completed' | 'archived';
   createdAt: string;
   updatedAt: string;
-  boardIds: string[]; // Associated boards
-  progress: number; // 0-100
+  boardIds: string[]; // Associated boards (legacy; the board a goal owns is `boardId`)
+  /** The single board this goal owns. Null until a plan has been applied (see applyPlan). */
+  boardId: string | null;
+  /** Lifecycle of the AI-generated plan attached to this goal. 'stale' is reserved for
+   *  when the goal's own definition changes after a plan was proposed/applied. */
+  planStatus: 'none' | 'proposed' | 'applied' | 'stale';
+  /** Plan returned by POST /api/goal-decompose, persisted as soon as it arrives so it
+   *  survives a reload — see WorkspaceProvider.handleProposeGoalPlan. */
+  plan: PlanProposal | null;
+  /** Lists/cards created the last time `plan` was applied to `boardId`. */
+  appliedRefs: { listIds: string[]; cardIds: string[] } | null;
+  /** Raw agent capability ids suggested for this goal (from plan.suggestedAgents).
+   *  TODO(agent-registry): once Phase 3's src/lib/agents/** registry lands, resolve
+   *  these (plus each card's assignmentHint) into real agent bindings. */
+  agentIds: string[];
+  progress: number; // 0-100, derived from computeGoalProgress over this goal's cards
+  progressDetail: GoalProgress | null;
   /** @deprecated superseded by the typed plan in Phase 5 */
   decomposedLists?: any[]; // AI-generated list structure
   assignedAgentTypes?: string[];

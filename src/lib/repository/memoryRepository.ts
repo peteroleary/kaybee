@@ -1,7 +1,10 @@
 import { BoardTemplate } from '../../data/templates';
+import { computeGoalProgress } from '../goals/progress';
+import { materializePlan, type NormalizeContext } from '../../shared/plan/normalize';
+import { PlanProposal } from '../../shared/contracts/goalPlan';
 import { ActivityLog, BoardData, CardItemData, ListConfig, UserGoal } from '../../types';
 import { INITIAL_BOARDS } from '../../data/initialData';
-import { BoardSummary } from './types';
+import { ApplyPlanOptions, AppliedRefs, BoardSummary } from './types';
 import {
   CreateBoardInput,
   CreateCardInput,
@@ -131,6 +134,26 @@ export function createMemoryRepository(seedBoards: BoardData[] = INITIAL_BOARDS)
       }
     }
     return null;
+  };
+
+  /**
+   * Recomputes a goal's progress from every card currently tagged with its
+   * id (across all boards) and persists the result onto the goal doc. Called
+   * from updateCard whenever a patch touches `status`/`progress` on a card
+   * that belongs to a goal — this is the "same write as the card change"
+   * requirement from Phase 5: the in-memory board mutation and this goal
+   * mutation happen synchronously, back to back, before either notification
+   * fires.
+   */
+  const recomputeAndPersistGoalProgress = (goalId: string) => {
+    const goalIdx = goals.findIndex(g => g.id === goalId);
+    if (goalIdx === -1) return;
+    const cardsForGoal = boards.flatMap(b => b.lists.flatMap(l => l.cards)).filter(c => c.goalId === goalId);
+    const detail = computeGoalProgress(cardsForGoal);
+    const updatedGoal: UserGoal = { ...goals[goalIdx], progress: detail.percent, progressDetail: detail };
+    goals = [...goals.slice(0, goalIdx), updatedGoal, ...goals.slice(goalIdx + 1)];
+    persistJson(GOALS_STORAGE_KEY, goals);
+    notifyGoals();
   };
 
   return {
@@ -297,18 +320,29 @@ export function createMemoryRepository(seedBoards: BoardData[] = INITIAL_BOARDS)
       const loc = findCardLocation(cardId);
       if (!loc) return;
       const boardId = boards[loc.boardIdx].id;
+      let patchedCard: CardItemData | null = null;
       boards = boards.map(b =>
         b.id === boardId
           ? {
               ...b,
               lists: b.lists.map(l => ({
                 ...l,
-                cards: l.cards.map(c => (c.id === cardId ? { ...c, ...patch, updatedAt: 'Just now' } : c)),
+                cards: l.cards.map(c => {
+                  if (c.id !== cardId) return c;
+                  const next = { ...c, ...patch, updatedAt: 'Just now' };
+                  patchedCard = next;
+                  return next;
+                }),
               })),
             }
           : b
       );
       notifyAllBoardTargets(boardId);
+
+      const touchesProgress = 'status' in patch || 'progress' in patch;
+      if (touchesProgress && patchedCard && (patchedCard as CardItemData).goalId) {
+        recomputeAndPersistGoalProgress((patchedCard as CardItemData).goalId as string);
+      }
     },
 
     async moveCard(cardId, targetListId, position) {
@@ -371,6 +405,49 @@ export function createMemoryRepository(seedBoards: BoardData[] = INITIAL_BOARDS)
       goals = goals.filter(g => g.id !== goalId);
       persistJson(GOALS_STORAGE_KEY, goals);
       notifyGoals();
+    },
+
+    async applyPlan(plan: PlanProposal, opts: ApplyPlanOptions): Promise<AppliedRefs> {
+      const { boardId, goalId, now } = opts;
+      const board = boards.find(b => b.id === boardId);
+      if (!board) throw new Error(`applyPlan: board "${boardId}" not found`);
+
+      let seq = 0;
+      const newId = (prefix: string) => `${boardId}-plan-${prefix}-${Date.now()}-${seq++}`;
+
+      const ctx: NormalizeContext = {
+        boardId,
+        goalId,
+        // Memory boards don't track a numeric `position` field on ListConfig —
+        // array order *is* position, so use the index.
+        existingLists: board.lists.map((l, idx) => ({ id: l.id, title: l.title, position: idx })),
+        now: now ?? Date.now(),
+        newId,
+      };
+
+      const materialized = materializePlan(plan, ctx);
+
+      const cardsByList = new Map<string, CardItemData[]>();
+      materialized.cards.forEach(c => {
+        const { boardId: _boardId, listId, position: _position, ...cardFields } = c;
+        const card: CardItemData = { ...cardFields, createdAt: 'Just now', updatedAt: 'Just now' };
+        const listCards = cardsByList.get(listId) ?? [];
+        listCards.push(card);
+        cardsByList.set(listId, listCards);
+      });
+
+      const newLists: ListConfig[] = materialized.lists.map(l => {
+        const { boardId: _boardId, position: _position, ...listFields } = l;
+        return { ...listFields, cards: cardsByList.get(l.id) ?? [] };
+      });
+
+      boards = boards.map(b => (b.id === boardId ? { ...b, lists: [...b.lists, ...newLists] } : b));
+      notifyAllBoardTargets(boardId);
+
+      return {
+        listIds: materialized.lists.map(l => l.id),
+        cardIds: materialized.cards.map(c => c.id),
+      };
     },
 
     async saveTemplate(template) {

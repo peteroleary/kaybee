@@ -2,12 +2,14 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { useAuth } from '../context/AuthContext';
 import { INITIAL_BOARDS } from '../data/initialData';
 import { BoardTemplate } from '../data/templates';
+import { applyGoalPlan } from '../lib/goals/applyPlan';
 import { bootstrapWorkspace } from '../lib/repository/bootstrap';
 import { diffCardPatch } from '../lib/repository/cardDiff';
 import { createFirestoreRepository } from '../lib/repository/firestoreRepository';
 import { createMemoryRepository } from '../lib/repository/memoryRepository';
 import { WorkspaceRepository } from '../lib/repository/workspaceRepository';
 import { newId } from '../shared/ids';
+import { PlanProposal } from '../shared/contracts/goalPlan';
 import {
   ActivityLog,
   BoardData,
@@ -19,11 +21,24 @@ import {
 } from '../types';
 import { useUiState } from './UiStateProvider';
 
+/** List titles that BoardCanvas's drag guard (see handleGuardedMoveCard)
+ *  already treats as "this card is done" — kept in sync here so that moving
+ *  a card into one of these lists also updates its status/progress, which
+ *  in turn drives goal-progress recomputation (see repository.updateCard). */
+const COMPLETED_LIST_TITLE_HINTS = ['done', 'completed', 'archive'];
+
+function isCompletedList(list: ListConfig | undefined): boolean {
+  if (!list) return false;
+  const title = list.title.toLowerCase();
+  return COMPLETED_LIST_TITLE_HINTS.some(hint => title.includes(hint));
+}
+
 export interface WorkspaceApi {
   boards: BoardData[];
   activeBoard: BoardData;
   activeBoardId: string;
   goals: UserGoal[];
+  goalsLoaded: boolean;
   customTemplates: BoardTemplate[];
   customTagColors: Record<string, string>;
   activities: ActivityLog[];
@@ -35,7 +50,13 @@ export interface WorkspaceApi {
   handleSaveTemplate(newTemplate: BoardTemplate): void;
   handleSaveGoal(goal: UserGoal): void;
   handleDeleteGoal(goalId: string): void;
-  handleDecomposeGoal(goal: UserGoal): void;
+  /** Persists a freshly-fetched PlanProposal onto the goal (planStatus -> 'proposed').
+   *  Nothing on the board changes until handleApplyGoalPlan runs. */
+  handleProposeGoalPlan(goalId: string, plan: PlanProposal): void;
+  /** Materializes goal.plan onto goal.boardId (creating the board first if needed). */
+  handleApplyGoalPlan(goal: UserGoal): Promise<void>;
+  /** Clears a not-yet-applied plan back off the goal without touching the board. */
+  handleDiscardGoalPlan(goalId: string): void;
   handleRenameTag(oldTag: string, newTag: string): void;
   handleDeleteTag(tagToDelete: string): void;
   handleUpdateTagColor(tag: string, colorKey: string): void;
@@ -97,6 +118,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [activeBoardId, setActiveBoardId] = useState<string>(INITIAL_BOARDS[0]?.id ?? '');
   const [currentRole, setCurrentRole] = useState<RBACRole>('admin');
   const [goals, setGoals] = useState<UserGoal[]>([]);
+  const [goalsLoaded, setGoalsLoaded] = useState(false);
   const [customTemplates, setCustomTemplates] = useState<BoardTemplate[]>([]);
   const [customTagColors, setCustomTagColors] = useState<Record<string, string>>({});
   const [activities, setActivities] = useState<ActivityLog[]>([]);
@@ -146,7 +168,13 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return unsub;
   }, [repository]);
 
-  useEffect(() => repository.subscribeGoals(setGoals), [repository]);
+  useEffect(() => {
+    setGoalsLoaded(false);
+    return repository.subscribeGoals(g => {
+      setGoals(g);
+      setGoalsLoaded(true);
+    });
+  }, [repository]);
   useEffect(() => repository.subscribeTemplates(setCustomTemplates), [repository]);
   useEffect(() => repository.subscribeTagColors(setCustomTagColors), [repository]);
   useEffect(() => repository.subscribeActivity(200, setActivities), [repository]);
@@ -215,26 +243,68 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [logActivity, repository]
   );
 
-  const handleDecomposeGoal = useCallback(
-    (goal: UserGoal) => {
-      if (goal.decomposedLists && goal.decomposedLists.length > 0) {
-        goal.decomposedLists.forEach((nl: any) => {
-          const cards: CardItemData[] = (nl.cards || []).map((c: any) => ({
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            widgets: [],
-            subtasks: [],
-            ...c,
-          }));
-          repository
-            .createList(activeBoardId, { ...nl, cards }, 'end')
-            .catch(logError('decompose goal into list'));
-        });
-        logActivity(`Decomposed goal "${goal.title}" into ${goal.decomposedLists.length} lists with autonomous tasks`);
+  const handleProposeGoalPlan = useCallback(
+    (goalId: string, plan: PlanProposal) => {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      const updated: UserGoal = {
+        ...goal,
+        plan,
+        planStatus: 'proposed',
+        updatedAt: new Date().toISOString(),
+      };
+      repository.saveGoal(updated).catch(logError('propose goal plan'));
+      logActivity(`AI proposed a plan for goal "${goal.title}" (${plan.newLists.length} lists, ${plan.newCards.length} loose cards)`);
+    },
+    [goals, logActivity, repository]
+  );
+
+  const handleApplyGoalPlan = useCallback(
+    async (goal: UserGoal) => {
+      if (!goal.plan) return;
+      try {
+        const { boardId, appliedRefs, agentIds, progress, progressDetail } = await applyGoalPlan(
+          repository,
+          goal,
+          goal.plan
+        );
+        const updated: UserGoal = {
+          ...goal,
+          boardId,
+          boardIds: goal.boardIds.includes(boardId) ? goal.boardIds : [...goal.boardIds, boardId],
+          planStatus: 'applied',
+          appliedRefs,
+          agentIds,
+          progress,
+          progressDetail,
+          updatedAt: new Date().toISOString(),
+        };
+        await repository.saveGoal(updated);
+        if (boardId !== activeBoardId) setActiveBoardId(boardId);
+        logActivity(
+          `Applied AI plan for goal "${goal.title}" (+${appliedRefs.listIds.length} lists, +${appliedRefs.cardIds.length} cards)`
+        );
+      } catch (err) {
+        logError('apply goal plan')(err);
       }
     },
     [activeBoardId, logActivity, repository]
+  );
+
+  const handleDiscardGoalPlan = useCallback(
+    (goalId: string) => {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      const updated: UserGoal = {
+        ...goal,
+        plan: null,
+        planStatus: goal.appliedRefs ? 'applied' : 'none',
+        updatedAt: new Date().toISOString(),
+      };
+      repository.saveGoal(updated).catch(logError('discard goal plan'));
+      logActivity(`Discarded proposed plan for goal "${goal.title}"`);
+    },
+    [goals, logActivity, repository]
   );
 
   const handleRenameTag = useCallback(
@@ -343,10 +413,21 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     (cardId: string, _sourceListId: string, targetListId: string) => {
       const targetList = activeBoard?.lists.find(l => l.id === targetListId);
       const index = targetList?.listType === 'chat_feed' ? targetList.cards.length : 0;
+
+      // Dragging into a "done"/"completed"/"archive" list marks the card
+      // complete, which (for goal-linked cards) drives goal progress via the
+      // repository's updateCard-time recompute — see repository.updateCard.
+      if (isCompletedList(targetList)) {
+        const card = findCard(cardId);
+        if (card && card.status !== 'completed') {
+          repository.updateCard(cardId, { status: 'completed', progress: 100 }).catch(logError('complete card on move'));
+        }
+      }
+
       repository.moveCard(cardId, targetListId, index).catch(logError('move card'));
       logActivity('Moved card between lists');
     },
-    [activeBoard, logActivity, repository]
+    [activeBoard, findCard, logActivity, repository]
   );
 
   const handleUpdateCardWidget = useCallback(
@@ -812,6 +893,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     activeBoard,
     activeBoardId,
     goals,
+    goalsLoaded,
     customTemplates,
     customTagColors,
     activities,
@@ -823,7 +905,9 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     handleSaveTemplate,
     handleSaveGoal,
     handleDeleteGoal,
-    handleDecomposeGoal,
+    handleProposeGoalPlan,
+    handleApplyGoalPlan,
+    handleDiscardGoalPlan,
     handleRenameTag,
     handleDeleteTag,
     handleUpdateTagColor,

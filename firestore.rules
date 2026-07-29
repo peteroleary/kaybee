@@ -59,6 +59,13 @@ service cloud.firestore {
       allow delete: if owns(resource);
     }
 
+    match /agents/{agentId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+    }
+
     // Activity log is append-only: no update, no delete.
     match /activity/{activityId} {
       allow read: if owns(resource);

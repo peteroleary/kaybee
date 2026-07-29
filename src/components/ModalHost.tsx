@@ -15,8 +15,8 @@ import { AutoArchiveModal } from './AutoArchiveModal';
 import { OverviewMapModal } from './OverviewMapModal';
 import { TagManagerModal } from './TagManagerModal';
 import { SaveTemplateModal } from './SaveTemplateModal';
-import { GoalCanvasModal } from './GoalCanvasModal';
 import { NewBoardModal } from './NewBoardModal';
+import { AgentRegistryModal } from '../features/agents/AgentRegistryModal';
 
 export function ModalHost() {
   const workspace = useWorkspace();
@@ -25,12 +25,8 @@ export function ModalHost() {
     boards,
     activeBoard,
     activeBoardId,
-    goals,
     customTemplates,
     customTagColors,
-    handleSaveGoal,
-    handleDeleteGoal,
-    handleDecomposeGoal,
     handleApplyOrchestratorResult,
     logActivity,
     handleSelectBoardTemplate,
@@ -54,17 +50,6 @@ export function ModalHost() {
 
   return (
     <>
-      {/* Goal Canvas Modal for Goal-Oriented UX */}
-      <GoalCanvasModal
-        isOpen={ui.isOpen('goalCanvas')}
-        onClose={() => ui.closeModal('goalCanvas')}
-        goals={goals}
-        onSaveGoal={handleSaveGoal}
-        onDeleteGoal={handleDeleteGoal}
-        onDecomposeGoal={handleDecomposeGoal}
-        boards={boards}
-      />
-
       {/* AI Orchestrator Agent Modal */}
       <OrchestratorModal
         isOpen={ui.isOpen('orchestrator')}
@@ -204,6 +189,9 @@ export function ModalHost() {
           ui.closeModal('newBoard');
         }}
       />
+
+      {/* Agent Registry Modal */}
+      <AgentRegistryModal isOpen={ui.isOpen('agentRegistry')} onClose={() => ui.closeModal('agentRegistry')} />
     </>
   );
 }

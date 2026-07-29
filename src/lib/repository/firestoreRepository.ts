@@ -23,12 +23,15 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { BoardTemplate } from '../../data/templates';
+import { computeGoalProgress } from '../goals/progress';
+import { materializePlan, type NormalizeContext } from '../../shared/plan/normalize';
+import { PlanProposal } from '../../shared/contracts/goalPlan';
 import { ActivityLog, BoardData, CardItemData, ListConfig, UserGoal } from '../../types';
 import { SEMANTIC_CARD_FIELDS } from './cardDiff';
 import { chunk, stripUndefined } from './firestoreUtils';
 import { hydrateBoard } from './hydrate';
 import { planInsert, positionAtIndex } from './position';
-import { BoardDoc, BoardSummary, CardDoc, ListDoc } from './types';
+import { ApplyPlanOptions, AppliedRefs, BoardDoc, BoardSummary, CardDoc, ListDoc } from './types';
 import {
   CreateBoardInput,
   CreateCardInput,
@@ -387,7 +390,56 @@ export function createFirestoreRepository(uid: string): WorkspaceRepository {
       const bumpRevision = Object.keys(patch).some(key => (SEMANTIC_CARD_FIELDS as string[]).includes(key));
       const data: Record<string, unknown> = stripUndefined({ ...patch, updatedAt: serverTimestamp() });
       if (bumpRevision) data.revision = increment(1);
-      await updateDoc(doc(db, 'cards', cardId), data);
+
+      const touchesProgress = 'status' in patch || 'progress' in patch;
+      if (!touchesProgress) {
+        await updateDoc(doc(db, 'cards', cardId), data);
+        return;
+      }
+
+      // A status/progress patch on a goal-linked card must recompute and
+      // persist that goal's progress in the same write (Phase 5 requirement).
+      // Read the card to find its goalId (patch itself rarely carries one),
+      // then fold this card's *incoming* status/progress into every sibling
+      // card already tagged with that goal before recomputing.
+      const cardSnap = await getDoc(doc(db, 'cards', cardId));
+      const existingCard = cardSnap.exists() ? (cardSnap.data() as CardDoc) : undefined;
+      const goalId = (patch as Partial<CardDoc>).goalId ?? existingCard?.goalId ?? null;
+
+      if (!goalId) {
+        await updateDoc(doc(db, 'cards', cardId), data);
+        return;
+      }
+
+      const goalCardsSnap = await getDocs(query(cardsCol, where('ownerUid', '==', uid), where('goalId', '==', goalId)));
+      let sawThisCard = false;
+      const projectedCards = goalCardsSnap.docs.map(d => {
+        const c = d.data() as CardDoc;
+        if (d.id === cardId) {
+          sawThisCard = true;
+          return {
+            status: (patch.status ?? c.status) as CardItemData['status'],
+            progress: (patch.progress ?? c.progress) as number,
+          };
+        }
+        return { status: c.status, progress: c.progress };
+      });
+      if (!sawThisCard) {
+        projectedCards.push({
+          status: (patch.status ?? existingCard?.status ?? 'todo') as CardItemData['status'],
+          progress: (patch.progress ?? existingCard?.progress ?? 0) as number,
+        });
+      }
+      const detail = computeGoalProgress(projectedCards);
+
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'cards', cardId), data);
+      batch.update(doc(db, 'goals', goalId), {
+        progress: detail.percent,
+        progressDetail: detail,
+        updatedAt: serverTimestamp(),
+      });
+      await batch.commit();
     },
 
     async moveCard(cardId, targetListId, index) {
@@ -427,6 +479,58 @@ export function createFirestoreRepository(uid: string): WorkspaceRepository {
 
     async deleteGoal(goalId) {
       await deleteDoc(doc(db, 'goals', goalId));
+    },
+
+    async applyPlan(plan: PlanProposal, opts: ApplyPlanOptions): Promise<AppliedRefs> {
+      const { boardId, goalId, now } = opts;
+
+      const existingListsSnap = await getDocs(query(listsCol, where('ownerUid', '==', uid), where('boardId', '==', boardId)));
+      const existingLists = existingListsSnap.docs.map(d => {
+        const data = d.data() as ListDoc;
+        return { id: d.id, title: data.title, position: data.position };
+      });
+
+      const ctx: NormalizeContext = {
+        boardId,
+        goalId,
+        existingLists,
+        now: now ?? Date.now(),
+        // Pre-allocate real Firestore doc ids so materializePlan's cross-references
+        // (dependsOnCardIds, list->card targeting) resolve to the ids we actually write.
+        newId: prefix => doc(prefix === 'list' ? listsCol : cardsCol).id,
+      };
+
+      const materialized = materializePlan(plan, ctx);
+
+      type WriteItem = { ref: DocumentReference; data: Record<string, unknown> };
+      const items: WriteItem[] = [
+        ...materialized.lists.map(l => {
+          const { id, ...fields } = l;
+          return {
+            ref: doc(listsCol, id),
+            data: stripUndefined({ ...fields, ownerUid: uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }),
+          };
+        }),
+        ...materialized.cards.map(c => {
+          const { id, ...fields } = c;
+          return {
+            ref: doc(cardsCol, id),
+            data: stripUndefined({ ...fields, ownerUid: uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }),
+          };
+        }),
+      ];
+
+      // Firestore batches cap at 500 ops; chunk() defaults to 450 to leave headroom.
+      for (const group of chunk(items)) {
+        const batch = writeBatch(db);
+        group.forEach(item => batch.set(item.ref, item.data));
+        await batch.commit();
+      }
+
+      return {
+        listIds: materialized.lists.map(l => l.id),
+        cardIds: materialized.cards.map(c => c.id),
+      };
     },
 
     async saveTemplate(template) {

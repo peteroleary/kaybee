@@ -13,10 +13,10 @@ export type ModalName =
   | 'overviewMap'
   | 'tagManager'
   | 'saveTemplate'
-  | 'goalCanvas'
   | 'newBoard'
   | 'cardDetail'
-  | 'listSettings';
+  | 'listSettings'
+  | 'agentRegistry';
 
 const MODAL_NAMES: ModalName[] = [
   'orchestrator',
@@ -31,10 +31,10 @@ const MODAL_NAMES: ModalName[] = [
   'overviewMap',
   'tagManager',
   'saveTemplate',
-  'goalCanvas',
   'newBoard',
   'cardDetail',
   'listSettings',
+  'agentRegistry',
 ];
 
 interface ModalState {

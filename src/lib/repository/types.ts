@@ -43,3 +43,17 @@ export interface UserProfileDoc {
   seededAt?: string | Date | null;
   tagColors: Record<string, string>;
 }
+
+export interface ApplyPlanOptions {
+  /** The board the plan's lists/cards are written to. */
+  boardId: string;
+  /** Goal these lists/cards are attributed to — stamped onto each generated card. */
+  goalId: string;
+  /** Injectable clock for deterministic tests; defaults to Date.now(). */
+  now?: number;
+}
+
+export interface AppliedRefs {
+  listIds: string[];
+  cardIds: string[];
+}
