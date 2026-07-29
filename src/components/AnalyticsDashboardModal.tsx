@@ -136,6 +136,7 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
 
   // List breakdown for active board
   const activeBoard = boards.find(b => b.id === (selectedBoardId === 'all' ? activeBoardId : selectedBoardId)) || boards[0];
+  if (!activeBoard) return null;
   const listBreakdownData = activeBoard.lists.map(l => ({
     title: l.title,
     count: l.cards.length,

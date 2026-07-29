@@ -860,7 +860,10 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const ready = repository.kind === 'memory' || (!bootstrapping && boardsLoaded);
 
-  if (!ready || !activeBoard) {
+  // Gate on readiness only — NOT on activeBoard. An empty workspace (zero
+  // boards) is a legitimate state: App falls back to the goal-first home.
+  // Requiring a board here hung the app on "Loading your workspace…" forever.
+  if (!ready) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#020617] text-slate-300 font-sans">
         Loading your workspace…

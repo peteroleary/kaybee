@@ -116,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   // Extract all unique tags across cards on active board
   const allBoardTagsSet = new Set<string>();
-  activeBoard.lists.forEach(l => {
+  activeBoard?.lists.forEach(l => {
     l.cards.forEach(c => {
       c.tags?.forEach(t => allBoardTagsSet.add(t));
     });
@@ -148,10 +148,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-xs font-semibold text-slate-200 transition-colors"
-            title={`Active Board: ${activeBoard.name}. Click to switch boards.`}
+            title={activeBoard ? `Active Board: ${activeBoard.name}. Click to switch boards.` : 'No boards yet — create one'}
           >
             <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="max-w-[120px] sm:max-w-[160px] truncate">{activeBoard.name}</span>
+            <span className="max-w-[120px] sm:max-w-[160px] truncate">{activeBoard?.name ?? 'No boards'}</span>
             <ChevronDown className="w-3 h-3 text-slate-400" />
           </button>
 

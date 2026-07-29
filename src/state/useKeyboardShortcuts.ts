@@ -20,7 +20,7 @@ export function useKeyboardShortcuts() {
 
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
-        ui.openModal('createCard', activeBoard.lists[0]?.id || null);
+        ui.openModal('createCard', activeBoard?.lists[0]?.id || null);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         if (ui.isOpen('search')) {

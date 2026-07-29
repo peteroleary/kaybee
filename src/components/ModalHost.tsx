@@ -52,27 +52,31 @@ export function ModalHost() {
         isOpen={ui.isOpen('boardTemplate')}
         onClose={() => ui.closeModal('boardTemplate')}
         onSelectTemplate={handleSelectBoardTemplate}
-        activeBoardName={activeBoard.name}
+        activeBoardName={activeBoard?.name ?? ''}
         customTemplates={customTemplates}
         onOpenSaveTemplateModal={() => ui.openModal('saveTemplate')}
       />
 
-      {/* Save Active Board as Template Modal */}
-      <SaveTemplateModal
-        isOpen={ui.isOpen('saveTemplate')}
-        onClose={() => ui.closeModal('saveTemplate')}
-        activeBoard={activeBoard}
-        onSaveTemplate={handleSaveTemplate}
-      />
+      {/* Save Active Board as Template Modal — needs a real board */}
+      {activeBoard && (
+        <SaveTemplateModal
+          isOpen={ui.isOpen('saveTemplate')}
+          onClose={() => ui.closeModal('saveTemplate')}
+          activeBoard={activeBoard}
+          onSaveTemplate={handleSaveTemplate}
+        />
+      )}
 
-      {/* Template-based Card Creation Modal */}
-      <CreateCardModal
-        isOpen={ui.isOpen('createCard')}
-        onClose={() => ui.closeModal('createCard')}
-        lists={activeBoard.lists}
-        defaultListId={ui.modalPayload<string | null>('createCard') || undefined}
-        onCreateCard={handleCreateCardWithData}
-      />
+      {/* Template-based Card Creation Modal — needs a real board */}
+      {activeBoard && (
+        <CreateCardModal
+          isOpen={ui.isOpen('createCard')}
+          onClose={() => ui.closeModal('createCard')}
+          lists={activeBoard.lists}
+          defaultListId={ui.modalPayload<string | null>('createCard') || undefined}
+          onCreateCard={handleCreateCardWithData}
+        />
+      )}
 
       {/* Global Search Modal */}
       <GlobalSearchModal
@@ -97,22 +101,26 @@ export function ModalHost() {
         onExecuteVoiceCommand={handleExecuteVoiceCommand}
       />
 
-      {/* Board Theme & Background Selector Modal */}
-      <ThemeSelectorModal
-        isOpen={ui.isOpen('theme')}
-        onClose={() => ui.closeModal('theme')}
-        currentThemeId={activeBoard.theme || 'indigo-nebula'}
-        onSelectTheme={handleSelectBoardTheme}
-        boardName={activeBoard.name}
-      />
+      {/* Board Theme & Background Selector Modal — needs a real board */}
+      {activeBoard && (
+        <ThemeSelectorModal
+          isOpen={ui.isOpen('theme')}
+          onClose={() => ui.closeModal('theme')}
+          currentThemeId={activeBoard.theme || 'indigo-nebula'}
+          onSelectTheme={handleSelectBoardTheme}
+          boardName={activeBoard.name}
+        />
+      )}
 
-      {/* Auto-Archive Routine Modal */}
-      <AutoArchiveModal
-        isOpen={ui.isOpen('autoArchive')}
-        onClose={() => ui.closeModal('autoArchive')}
-        board={activeBoard}
-        onRunAutoArchive={handleRunAutoArchive}
-      />
+      {/* Auto-Archive Routine Modal — needs a real board */}
+      {activeBoard && (
+        <AutoArchiveModal
+          isOpen={ui.isOpen('autoArchive')}
+          onClose={() => ui.closeModal('autoArchive')}
+          board={activeBoard}
+          onRunAutoArchive={handleRunAutoArchive}
+        />
+      )}
 
       {/* Overview Map & Dependency Graph Modal */}
       <OverviewMapModal
