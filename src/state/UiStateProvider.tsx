@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useReducer, useState } from 'react';
 
 export type ModalName =
-  | 'orchestrator'
   | 'interconnect'
   | 'boardTemplate'
   | 'createCard'
@@ -19,7 +18,6 @@ export type ModalName =
   | 'agentRegistry';
 
 const MODAL_NAMES: ModalName[] = [
-  'orchestrator',
   'interconnect',
   'boardTemplate',
   'createCard',
@@ -89,6 +87,10 @@ export interface UiApi {
   setSelectedTagFilter(t: string | null): void;
   appMode: 'home' | 'board';
   setAppMode(m: 'home' | 'board'): void;
+  /** Orchestrator dock (right rail) visibility — replaces the old 'orchestrator' modal. */
+  dockOpen: boolean;
+  setDockOpen(open: boolean): void;
+  toggleDock(): void;
 }
 
 const UiStateContext = createContext<UiApi | null>(null);
@@ -101,6 +103,7 @@ export const UiStateProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isHeatmapActive, setIsHeatmapActive] = useState(false);
   const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
   const [appMode, setAppMode] = useState<'home' | 'board'>('board');
+  const [dockOpen, setDockOpen] = useState(false);
 
   const openModal = useCallback((name: ModalName, ...payloadArgs: [unknown?]) => {
     dispatch({ type: 'OPEN', name, hasPayload: payloadArgs.length > 0, payload: payloadArgs[0] });
@@ -127,6 +130,7 @@ export const UiStateProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const toggleSmartFilter = useCallback(() => setSmartFilterActive(prev => !prev), []);
   const toggleHeatmap = useCallback(() => setIsHeatmapActive(prev => !prev), []);
+  const toggleDock = useCallback(() => setDockOpen(prev => !prev), []);
 
   const value: UiApi = {
     openModal,
@@ -146,6 +150,9 @@ export const UiStateProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSelectedTagFilter,
     appMode,
     setAppMode,
+    dockOpen,
+    setDockOpen,
+    toggleDock,
   };
 
   return <UiStateContext.Provider value={value}>{children}</UiStateContext.Provider>;

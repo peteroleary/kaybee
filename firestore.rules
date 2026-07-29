@@ -66,6 +66,21 @@ service cloud.firestore {
       allow delete: if owns(resource);
     }
 
+    // Orchestrator conversation threads and their messages (Phase 6).
+    match /threads/{threadId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+
+      match /messages/{messageId} {
+        allow read: if owns(resource);
+        allow create: if creatingOwn();
+        allow update: if owns(resource) && ownerUnchanged();
+        allow delete: if owns(resource);
+      }
+    }
+
     // Activity log is append-only: no update, no delete.
     match /activity/{activityId} {
       allow read: if owns(resource);

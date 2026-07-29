@@ -5,6 +5,7 @@ import { Field, fieldControlClasses } from '../../components/ui/Field';
 import { Panel } from '../../components/ui/Panel';
 import { cn } from '../../lib/cn';
 import { useWorkspace } from '../../state/WorkspaceProvider';
+import { useOrchestrator } from '../orchestrator/OrchestratorProvider';
 import type { UserGoal } from '../../types';
 import { GoalCard } from './GoalCard';
 
@@ -16,6 +17,7 @@ import { GoalCard } from './GoalCard';
  */
 export function GoalHome() {
   const workspace = useWorkspace();
+  const orchestrator = useOrchestrator();
   const { goals } = workspace;
 
   const [title, setTitle] = useState('');
@@ -49,6 +51,12 @@ export function GoalHome() {
     };
 
     workspace.handleSaveGoal(goal);
+    // Goal-first flow: open an orchestrator thread linked to this goal and
+    // ask for a plan immediately — the proposal waits in the dock for review;
+    // nothing lands on a board until the user applies it there.
+    orchestrator
+      .startGoalThread(goal)
+      .catch(err => console.error('Failed to start orchestrator thread for goal:', err));
     setTitle('');
     setDescription('');
     setOutcome('');

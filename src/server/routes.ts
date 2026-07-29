@@ -71,26 +71,28 @@ router.post("/goal-decompose", async (req, res) => {
   }
 });
 
-// Orchestrator AI Endpoint
+// Orchestrator AI Endpoint — multi-turn, context-carrying. The client sends
+// {threadId, message, context, history, summary}; the response is the bare
+// OrchestratorResponse ({summary, proposal}). The transitional top-level
+// newLists/newCards duplicates were dropped in Phase 6 with OrchestratorModal.
 router.post("/orchestrate", async (req, res) => {
   try {
-    const { prompt, currentBoard } = req.body;
+    const { message, context, history, summary } = req.body ?? {};
 
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt is required" });
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "message (string) is required" });
     }
 
-    const result = await callOrchestrator(prompt, currentBoard);
+    const result = await callOrchestrator({
+      message,
+      context: typeof context === "string" ? context : undefined,
+      history,
+      summary: typeof summary === "string" ? summary : undefined,
+    });
 
-    // Transitional: duplicate proposal.* at the top level because
-    // OrchestratorModal.tsx still reads `data.newLists` / `data.newCards`
-    // directly. Drop the top-level duplicates in Phase 6 once the client
-    // migrates to reading `proposal` (see src/shared/contracts/orchestrator.ts).
     return res.json({
       summary: result.summary,
       proposal: result.proposal,
-      newLists: result.proposal.newLists,
-      newCards: result.proposal.newCards,
     });
   } catch (error: any) {
     if (error instanceof ModelResponseError) {

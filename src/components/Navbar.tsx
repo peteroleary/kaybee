@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { BoardData, RBACRole } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { Button } from './ui/Button';
 import { IconButton } from './ui/IconButton';
 
 
@@ -261,26 +262,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         )}
 
-        {/* AI Orchestrator Trigger */}
-        <button
+        {/* AI Orchestrator Dock Trigger — the single primary action */}
+        <Button
+          variant="primary"
+          size="sm"
           onClick={onOpenOrchestrator}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-colors"
-          title="AI Orchestrator Routine Engine (Gemini)"
+          title="Orchestrator: multi-turn planning dock (proposes plans, applies nothing until you confirm)"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span className="hidden lg:inline">AI Orchestrator</span>
-        </button>
+          <span className="hidden lg:inline">Orchestrator</span>
+        </Button>
 
-        {/* Goal Canvas Button - Primary Action for Goal-Oriented UX */}
+        {/* Goal Home — secondary action */}
         {onOpenGoalCanvas && (
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={onOpenGoalCanvas}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition-colors"
-            title="Goal Canvas: Define outcomes and let agents execute autonomously"
+            title="Goals: define outcomes and review AI-proposed plans"
           >
             <Target className="w-3.5 h-3.5" />
             <span className="hidden lg:inline">Goals</span>
-          </button>
+          </Button>
         )}
 
         {/* Agent Registry Trigger */}

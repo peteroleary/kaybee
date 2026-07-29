@@ -1,7 +1,6 @@
 import { CardItemData, ListConfig } from '../types';
 import { useWorkspace } from '../state/WorkspaceProvider';
 import { useUiState } from '../state/UiStateProvider';
-import { OrchestratorModal } from './OrchestratorModal';
 import { CardDetailModal } from './CardDetailModal';
 import { ListSettingsModal } from './ListSettingsModal';
 import { BoardInterconnectModal } from './BoardInterconnectModal';
@@ -27,8 +26,6 @@ export function ModalHost() {
     activeBoardId,
     customTemplates,
     customTagColors,
-    handleApplyOrchestratorResult,
-    logActivity,
     handleSelectBoardTemplate,
     handleSaveTemplate,
     handleCreateCardWithData,
@@ -50,15 +47,6 @@ export function ModalHost() {
 
   return (
     <>
-      {/* AI Orchestrator Agent Modal */}
-      <OrchestratorModal
-        isOpen={ui.isOpen('orchestrator')}
-        onClose={() => ui.closeModal('orchestrator')}
-        activeBoard={activeBoard}
-        onApplyOrchestratorResult={handleApplyOrchestratorResult}
-        onLogActivity={(msg) => logActivity(msg)}
-      />
-
       {/* Board Template Library Modal */}
       <BoardTemplateModal
         isOpen={ui.isOpen('boardTemplate')}

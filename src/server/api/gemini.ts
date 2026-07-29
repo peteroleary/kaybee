@@ -89,32 +89,54 @@ function buildOrchestratorFallbackProposal(prompt: string): PlanProposal {
   });
 }
 
-export async function callOrchestrator(
-  prompt: string,
-  currentBoard?: any
-): Promise<OrchestratorResponse> {
+export interface OrchestratorCallInput {
+  message: string;
+  /** Capped context block from the client's buildOrchestratorContext. */
+  context?: string;
+  /** Last-16-message window of the thread. */
+  history?: unknown;
+  /** Rolling thread summary. */
+  summary?: string;
+}
+
+const OrchestratorHistoryEntrySchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  text: z.string(),
+});
+
+function sanitizeHistory(history: unknown): Array<{ role: "user" | "assistant"; text: string }> {
+  const parsed = z.array(OrchestratorHistoryEntrySchema).max(16).safeParse(history);
+  return parsed.success ? parsed.data : [];
+}
+
+export async function callOrchestrator(input: OrchestratorCallInput): Promise<OrchestratorResponse> {
   const ai = getGeminiClient();
 
   if (!ai) {
     return {
-      summary: `Orchestrator synthesized a plan for: "${prompt}"`,
-      proposal: buildOrchestratorFallbackProposal(prompt),
+      summary: `Orchestrator synthesized a plan for: "${input.message}"`,
+      proposal: buildOrchestratorFallbackProposal(input.message),
     };
   }
 
   const systemInstruction = `You are the Orchestrator Agent for KayBee - The Next-Gen Kanban Board.
 Your job is to parse natural language requests and return a JSON structured object detailing what lists and cards should be created on the board.
+Use the workspace context, thread summary, and conversation history below to make the plan specific: prefer adding cards to existing lists when the context shows a good match, reference real agent capabilities for assignedAgentType, and keep new list titles consistent with the board's naming style.
 
 ${describePlanSchemaForPrompt()}`;
 
+  const history = sanitizeHistory(input.history);
+  const historyBlock =
+    history.length > 0
+      ? `\n\nRecent conversation:\n${history.map(h => `${h.role}: ${h.text}`).join("\n")}`
+      : "";
+  const summaryBlock = input.summary ? `\n\nThread summary so far: ${input.summary}` : "";
+
   const response = await ai.models.generateContent({
     model: MODELS.orchestrator,
-    contents: `Current Board Context: ${JSON.stringify({
-      name: currentBoard?.name,
-      lists: currentBoard?.lists?.map((l: any) => ({ title: l.title, type: l.listType, cardCount: l.cards?.length })),
-    })}
+    contents: `Workspace Context:\n${input.context || "No workspace context provided."}${summaryBlock}${historyBlock}
 
-User Request: "${prompt}"`,
+User Request: "${input.message}"`,
     config: {
       systemInstruction,
       responseMimeType: "application/json",

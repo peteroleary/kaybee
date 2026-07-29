@@ -34,6 +34,10 @@ export interface UserGoal {
   boardIds: string[]; // Associated boards (legacy; the board a goal owns is `boardId`)
   /** The single board this goal owns. Null until a plan has been applied (see applyPlan). */
   boardId: string | null;
+  /** Per-goal autonomy override — set by the orchestrator's "Apply & Run"; read by
+   *  src/lib/autonomy/eligibility.ts (false opts the goal out; with
+   *  requireApprovalForFirstRunOfGoal, true is the approval). */
+  autonomy?: { enabled?: boolean } | null;
   /** Lifecycle of the AI-generated plan attached to this goal. 'stale' is reserved for
    *  when the goal's own definition changes after a plan was proposed/applied. */
   planStatus: 'none' | 'proposed' | 'applied' | 'stale';
