@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Layers, X } from 'lucide-react';
 import { BoardData } from '../types';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface NewBoardModalProps {
   isOpen: boolean;
@@ -68,13 +69,15 @@ export const NewBoardModal: React.FC<NewBoardModalProps> = ({ isOpen, onClose, o
           >
             Cancel
           </button>
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={handleCreate}
             disabled={!newBoardName.trim()}
-            className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors"
+            className="font-semibold"
           >
             Initialize Board
-          </button>
+          </Button>
         </div>
     </Modal>
   );

@@ -22,6 +22,7 @@ import {
   BoardTemplate
 } from '../data/templates';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface BoardTemplateModalProps {
   isOpen: boolean;
@@ -234,17 +235,19 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
           </div>
           <div className="flex items-center gap-2">
             {onOpenSaveTemplateModal && (
-              <button
+              <Button
+                variant="primary"
+                size="sm"
                 onClick={() => {
                   onClose();
                   onOpenSaveTemplateModal();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-accent hover:bg-accent-hi text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
+                className="font-bold"
                 title="Save current board state as a new reusable template"
               >
                 <BookmarkPlus className="w-4 h-4 text-indigo-200" />
                 <span className="hidden sm:inline">Save Board as Template</span>
-              </button>
+              </Button>
             )}
 
             <button 
@@ -419,13 +422,15 @@ export const BoardTemplateModal: React.FC<BoardTemplateModalProps> = ({
                   <span className="text-xs opacity-70 truncate max-w-[120px]">({activeBoardName})</span>
                 </button>
 
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => onSelectTemplate(selectedTemplate, 'create_new')}
-                  className="w-full sm:w-auto px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto font-semibold"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create New Board from Template</span>
-                </button>
+                </Button>
               </div>
             </div>
           </div>

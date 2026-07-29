@@ -4,6 +4,7 @@ import { CARD_TEMPLATES, CardTemplate } from '../data/templates';
 import { CardItemData, EntityType, ListConfig } from '../types';
 import { autoSuggestTags } from '../utils/nlpAutoTag';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface CreateCardModalProps {
   isOpen: boolean;
@@ -300,14 +301,16 @@ export const CreateCardModal: React.FC<CreateCardModalProps> = ({
           >
             Cancel
           </button>
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={handleCreate}
             disabled={!title.trim()}
-            className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi disabled:opacity-40 text-white font-semibold text-xs transition-colors flex items-center gap-1.5"
+            className="font-semibold"
           >
             <Plus className="w-4 h-4" />
             <span>Create Card</span>
-          </button>
+          </Button>
         </div>
     </Modal>
   );

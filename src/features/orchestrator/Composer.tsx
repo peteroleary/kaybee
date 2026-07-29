@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { AlertCircle, Loader2, Mic, MicOff, Send } from 'lucide-react';
 import { cn } from '../../lib/cn';
 import { apiPost } from '../../lib/api/client';
+import { Button } from '../../components/ui/Button';
 
 interface ComposerProps {
   value: string;
@@ -111,15 +112,16 @@ export const Composer: React.FC<ComposerProps> = ({ value, onChange, onSend, sen
             {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-accent-hi" />}
           </button>
 
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onSend}
             disabled={busy || !value.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-control bg-accent hover:bg-accent-hi disabled:opacity-40 text-white font-medium text-xs transition-colors"
             title="Send to Orchestrator (proposes a plan — never applies it directly)"
           >
             {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
             <span>{loading ? 'Transcribing…' : sending ? 'Thinking…' : 'Send'}</span>
-          </button>
+          </Button>
         </div>
       </div>
 

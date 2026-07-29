@@ -15,6 +15,7 @@ import {
 import { BoardData } from '../types';
 import { BoardTemplate } from '../data/templates';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface SaveTemplateModalProps {
   isOpen: boolean;
@@ -258,14 +259,16 @@ export const SaveTemplateModal: React.FC<SaveTemplateModalProps> = ({
               Cancel
             </button>
             
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               type="submit"
               disabled={isSavedSuccess || !templateName.trim()}
-              className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi disabled:opacity-50 text-white text-xs font-bold flex items-center gap-2 transition-colors"
+              className="font-bold disabled:opacity-50"
             >
               <BookmarkPlus className="w-4 h-4" />
               <span>Save Custom Template</span>
-            </button>
+            </Button>
           </div>
 
         </form>

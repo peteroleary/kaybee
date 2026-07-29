@@ -29,6 +29,7 @@ import {
 } from 'recharts';
 import { BoardData, CardItemData } from '../types';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface AnalyticsDashboardModalProps {
   isOpen: boolean;
@@ -423,12 +424,9 @@ export const AnalyticsDashboardModal: React.FC<AnalyticsDashboardModalProps> = (
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span>Telemetry automatically synchronized across human-agent swarm actions</span>
           </div>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-medium text-xs transition-colors"
-          >
+          <Button variant="primary" size="sm" onClick={onClose}>
             Close Dashboard
-          </button>
+          </Button>
         </div>
 
     </Modal>

@@ -34,6 +34,7 @@ import {
 import { CardItemData, EntityType, InteractiveWidget, WidgetType, BoardData, CardComment, CardDelegate } from '../types';
 import { TimeLoggerWidget } from './TimeLoggerWidget';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 import { AgentPicker } from '../features/agents/AgentPicker';
 import { useAgents } from '../state/AgentProvider';
 import { AgentDoc } from '../lib/agents/types';
@@ -1028,9 +1029,9 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
               </button>
             )}
           </div>
-          <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors">
+          <Button variant="primary" size="sm" onClick={handleSave} className="font-semibold">
             Save Card Changes
-          </button>
+          </Button>
         </div>
     </Modal>
   );

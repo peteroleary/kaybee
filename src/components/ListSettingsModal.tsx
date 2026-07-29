@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Settings, GitFork } from 'lucide-react';
 import { ListConfig, ListType, HomogenousType, BoardData } from '../types';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface ListSettingsModalProps {
   list: ListConfig | null;
@@ -179,9 +180,9 @@ export const ListSettingsModal: React.FC<ListSettingsModalProps> = ({
           <button onClick={onClose} className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-slate-300 font-medium text-xs transition-colors">
             Cancel
           </button>
-          <button onClick={handleSave} className="px-5 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors">
+          <Button variant="primary" size="sm" onClick={handleSave} className="font-semibold">
             Save List Config
-          </button>
+          </Button>
         </div>
     </Modal>
   );

@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Palette, Check } from 'lucide-react';
 import { BOARD_THEMES } from '../data/tagsAndThemes';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface ThemeSelectorModalProps {
   isOpen: boolean;
@@ -97,12 +98,9 @@ export const ThemeSelectorModal: React.FC<ThemeSelectorModalProps> = ({
         {/* Footer */}
         <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between text-xs text-slate-400">
           <span className="text-xs font-mono">Themes persist across workspace sessions</span>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-accent hover:bg-accent-hi text-white font-medium text-xs transition-colors"
-          >
+          <Button variant="primary" size="sm" onClick={onClose}>
             Apply & Done
-          </button>
+          </Button>
         </div>
 
     </Modal>

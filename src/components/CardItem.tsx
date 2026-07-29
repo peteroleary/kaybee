@@ -23,6 +23,7 @@ import {
 import { CardItemData, EntityType, InteractiveWidget, RBACRole } from '../types';
 import { getTagStyle } from '../data/tagsAndThemes';
 import { StatusDot, Status } from './ui/StatusDot';
+import { Button } from './ui/Button';
 
 interface CardItemProps {
   card: CardItemData;
@@ -423,10 +424,12 @@ export const CardItem: React.FC<CardItemProps> = ({
                       <span>{w.label}</span>
                     </span>
                   </div>
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={handleRunAgent}
                     disabled={isRunning || card.executionStatus === 'running'}
-                    className="w-full flex items-center justify-center gap-2 py-1.5 rounded-control bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors disabled:opacity-60"
+                    className="w-full font-semibold disabled:opacity-60"
                   >
                     {isRunning || card.executionStatus === 'running' ? (
                       <>
@@ -439,7 +442,7 @@ export const CardItem: React.FC<CardItemProps> = ({
                         <span>Run Agent Routine</span>
                       </>
                     )}
-                  </button>
+                  </Button>
                 </div>
               );
             }
