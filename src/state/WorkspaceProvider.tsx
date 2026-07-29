@@ -3,12 +3,18 @@ import { useAuth } from '../context/AuthContext';
 import { INITIAL_BOARDS } from '../data/initialData';
 import { BoardTemplate } from '../data/templates';
 import { applyGoalPlan } from '../lib/goals/applyPlan';
+import { apiPost } from '../lib/api/client';
+import { MAX_FEED_FORWARD_HOPS, sanitizeRoutedClone } from '../lib/autonomy/feedForward';
+import { mergeWidgetsById } from '../lib/autonomy/runResult';
+import { useRunEngine } from '../lib/autonomy/useRunEngine';
+import { AutonomyProvider } from '../features/runs/AutonomyContext';
 import { bootstrapWorkspace } from '../lib/repository/bootstrap';
 import { diffCardPatch } from '../lib/repository/cardDiff';
 import { createFirestoreRepository } from '../lib/repository/firestoreRepository';
 import { createMemoryRepository } from '../lib/repository/memoryRepository';
-import { WorkspaceRepository } from '../lib/repository/workspaceRepository';
+import { CreateCardInput, WorkspaceRepository } from '../lib/repository/workspaceRepository';
 import { newId } from '../shared/ids';
+import { AgentRunApiResponse } from '../shared/contracts/agentRun';
 import { PlanProposal } from '../shared/contracts/goalPlan';
 import {
   ActivityLog,
@@ -72,7 +78,6 @@ export interface WorkspaceApi {
   handleUpdateCardWidget(cardId: string, widgetId: string, newValue: any): void;
   handleRunAgentTask(card: CardItemData): Promise<void>;
   handleTriggerCrossBoardFeed(card: CardItemData): void;
-  handleApplyOrchestratorResult(data: any): void;
   handleAddCard(listId: string): void;
   handleSendChatMessage(listId: string, messageText: string): void;
   handleAddList(direction: 'left' | 'right'): void;
@@ -444,47 +449,91 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const handleTriggerCrossBoardFeed = useCallback(
     (card: CardItemData) => {
       if (!card.targetBoardFeedId) return;
+      // Loop guard: a card at the hop cap never routes again.
+      if ((card.lineage?.hopCount ?? 0) >= MAX_FEED_FORWARD_HOPS) return;
 
       const targetBoard = boards.find(b => b.id === card.targetBoardFeedId);
       const targetList = targetBoard?.lists[0];
       if (!targetBoard || !targetList) return;
 
-      const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...cardFields } = card;
-      repository
-        .createCard(targetBoard.id, targetList.id, {
-          ...cardFields,
-          title: `[Routed] ${card.title}`,
-          description: `Automatically routed from ${activeBoard?.name ?? ''}. Output: ${card.lastExecutionOutput || 'Completed'}`,
-        })
-        .catch(logError('route card cross-board'));
+      // Sanitized clone — NOT a `...card` spread: the old spread kept
+      // targetBoardFeedId and the prompt_runner widget, so a routed clone was
+      // both auto-loopable and manually re-runnable (an unbounded,
+      // token-burning card-spawn loop once autonomy is on).
+      const input = sanitizeRoutedClone(card, {
+        description: `Automatically routed from ${activeBoard?.name ?? ''}. Output: ${card.lastExecutionOutput || 'Completed'}`,
+      });
+      repository.createCard(targetBoard.id, targetList.id, input).catch(logError('route card cross-board'));
 
       logActivity(`Feed-Forward routed card "${card.title}" to ${targetBoard.name || 'Executive Master'}`);
     },
     [activeBoard, boards, logActivity, repository]
   );
 
-  // Run Agent Task using server endpoint. Kept byte-for-byte on the network
-  // call (including its known res.ok / suggestedProgress bugs) per Phase 2
-  // scope — only the persistence call at the end is repository-routed.
+  // Destination for engine-routed clones (feed-forward connections and the
+  // legacy targetBoardFeedId path). The engine builds the sanitized input via
+  // sanitizeRoutedClone; here we only persist it.
+  const routeCard = useCallback(
+    (targetBoardId: string, targetListId: string, input: CreateCardInput, _sourceCard: CardItemData) => {
+      repository.createCard(targetBoardId, targetListId, input).catch(logError('route card'));
+    },
+    [repository]
+  );
+
+  // The autonomy run engine. Signed out -> unavailable (runs/policy persist in
+  // Firestore, which needs auth); the manual run path below then falls back to
+  // a direct apiPost call, exactly today's behavior.
+  const autonomy = useRunEngine({
+    uid: user?.uid ?? null,
+    boards,
+    goals,
+    routeCard,
+    logActivity,
+  });
+
+  // Manual "Run Agent Task". Signed in: delegated to the run engine
+  // (deterministic run id, lease, budget accounting, executionStatus writes).
+  // Signed out: direct apiPost fallback with the same result semantics —
+  // res.ok is enforced by apiPost (throws on non-2xx), a legitimate
+  // suggestedProgress of 0 is preserved (never coerced to 100), and the
+  // server's updatedWidgets are merged into the card by id.
   const handleRunAgentTask = useCallback(
     async (card: CardItemData) => {
+      if (autonomy.available) {
+        await autonomy.runCardNow(card.id);
+        return;
+      }
+
+      const runId = newId('run');
       try {
-        const res = await fetch('/api/agent-run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        const data = await apiPost<AgentRunApiResponse>(
+          '/api/agent-run',
+          {
+            runId,
+            cardId: card.id,
+            agentId: card.assignedAgentId ?? null,
             cardTitle: card.title,
             cardDescription: card.description,
             prompt: card.prompt || 'Execute card routine and evaluate widgets',
             widgets: card.widgets,
-          }),
-        });
+          },
+          { idempotencyKey: runId }
+        );
 
-        const data = await res.json();
+        if ('error' in data) {
+          await repository.updateCard(card.id, {
+            executionStatus: 'error',
+            lastExecutionOutput: data.error.message,
+          });
+          console.error(`Agent run failed (${data.error.code}): ${data.error.message}`);
+          return;
+        }
 
         await repository.updateCard(card.id, {
           status: 'completed',
-          progress: data.suggestedProgress || 100,
+          executionStatus: 'success',
+          ...(data.suggestedProgress != null ? { progress: data.suggestedProgress } : {}),
+          widgets: mergeWidgetsById(card.widgets ?? [], data.updatedWidgets),
           lastExecutionOutput: data.output,
         });
 
@@ -495,79 +544,10 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       } catch (err: any) {
         console.error('Failed to run agent task:', err);
+        repository.updateCard(card.id, { executionStatus: 'error' }).catch(logError('mark agent run failed'));
       }
     },
-    [logActivity, handleTriggerCrossBoardFeed, repository]
-  );
-
-  const handleApplyOrchestratorResult = useCallback(
-    (data: any) => {
-      if (!data) return;
-
-      (async () => {
-        const createdLists: { id: string; title: string }[] = [];
-
-        if (data.newLists && Array.isArray(data.newLists)) {
-          for (const nl of data.newLists) {
-            const cards: CardItemData[] = (nl.cards || []).map((c: any) => ({
-              id: '',
-              createdAt: '',
-              updatedAt: '',
-              subtasks: [],
-              title: c.title || 'Generated Task',
-              description: c.description || 'Auto-generated by Orchestrator Agent',
-              entityType: c.entityType || 'agent',
-              status: 'in_progress',
-              progress: c.progress || 50,
-              rbacRole: 'contributor',
-              priority: c.priority || 'medium',
-              tags: c.tags || ['Orchestrator'],
-              widgets: c.widgets || [],
-              ...c,
-            }));
-            const listId = await repository.createList(
-              activeBoardId,
-              {
-                title: nl.title || 'AI Generated List',
-                listType: nl.listType || 'kanban',
-                homogenousType: nl.homogenousType || 'none',
-                color: nl.color || 'indigo',
-                icon: 'Sparkles',
-                autoRunAgents: true,
-                rbacRole: 'contributor',
-                cards,
-              },
-              'end'
-            );
-            createdLists.push({ id: listId, title: nl.title || 'AI Generated List' });
-          }
-        }
-
-        if (data.newCards && Array.isArray(data.newCards)) {
-          const availableLists = [
-            ...(activeBoard?.lists.map(l => ({ id: l.id, title: l.title })) ?? []),
-            ...createdLists,
-          ];
-          for (const nc of data.newCards) {
-            const target = availableLists.find(l => l.title.toLowerCase().includes((nc.targetListTitle || '').toLowerCase()));
-            const targetListId = target?.id ?? availableLists[0]?.id;
-            if (!targetListId) continue;
-            await repository.createCard(activeBoardId, targetListId, {
-              title: nc.title || 'AI Created Task',
-              description: nc.description || 'Added by Orchestrator Agent',
-              entityType: nc.entityType || 'task',
-              status: 'todo',
-              progress: nc.progress || 0,
-              rbacRole: 'contributor',
-              priority: nc.priority || 'high',
-              tags: nc.tags || ['AI-Added'],
-              widgets: nc.widgets || [],
-            });
-          }
-        }
-      })().catch(logError('apply orchestrator result'));
-    },
-    [activeBoardId, activeBoard, repository]
+    [autonomy, logActivity, handleTriggerCrossBoardFeed, repository]
   );
 
   const handleAddCard = useCallback(
@@ -918,7 +898,6 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     handleUpdateCardWidget,
     handleRunAgentTask,
     handleTriggerCrossBoardFeed,
-    handleApplyOrchestratorResult,
     handleAddCard,
     handleSendChatMessage,
     handleAddList,
@@ -937,7 +916,11 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     handleExportBoardImage,
   };
 
-  return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
+  return (
+    <WorkspaceContext.Provider value={value}>
+      <AutonomyProvider api={autonomy}>{children}</AutonomyProvider>
+    </WorkspaceContext.Provider>
+  );
 };
 
 export function useWorkspace(): WorkspaceApi {

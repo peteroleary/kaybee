@@ -18,7 +18,8 @@ service cloud.firestore {
       return request.resource.data.ownerUid == resource.data.ownerUid;
     }
 
-    // User profile: seededAt, tagColors, autonomy policy placeholder.
+    // User profile: seededAt, tagColors, and the autonomy policy
+    // (users/{uid}.autonomy — the global kill switch + budget counter).
     // Strictly single-owner — no cross-user read, unlike the collections below.
     match /users/{userId} {
       allow read, write: if signedIn() && request.auth.uid == userId;
@@ -64,6 +65,16 @@ service cloud.firestore {
       allow create: if creatingOwn();
       allow update: if owns(resource) && ownerUnchanged();
       allow delete: if owns(resource);
+    }
+
+    // Run records are created only in `queued` state by the client; the
+    // engine's lease claim / settle writes are ordinary owner-scoped updates
+    // (ownerUid immutable). Runs are never deleted.
+    match /runs/{runId} {
+      allow read: if owns(resource);
+      allow create: if creatingOwn() && request.resource.data.status == 'queued';
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if false;
     }
 
     // Orchestrator conversation threads and their messages (Phase 6).

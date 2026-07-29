@@ -425,10 +425,10 @@ export const CardItem: React.FC<CardItemProps> = ({
                   </div>
                   <button
                     onClick={handleRunAgent}
-                    disabled={isRunning}
+                    disabled={isRunning || card.executionStatus === 'running'}
                     className="w-full flex items-center justify-center gap-2 py-1.5 rounded-control bg-accent hover:bg-accent-hi text-white font-semibold text-xs transition-colors disabled:opacity-60"
                   >
-                    {isRunning ? (
+                    {isRunning || card.executionStatus === 'running' ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         <span>Executing Gemini Task...</span>

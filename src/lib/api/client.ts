@@ -2,6 +2,7 @@ import { auth } from "../firebase";
 
 export interface ApiPostOptions {
   idempotencyKey?: string;
+  signal?: AbortSignal;
 }
 
 /** Typed error thrown by `apiPost` for any non-2xx response. */
@@ -51,10 +52,9 @@ async function buildHeaders(idempotencyKey: string | undefined, forceRefresh: bo
  * where a cached token expired mid-session. Throws `ApiClientError` (with
  * the HTTP status attached) for any other non-2xx response.
  *
- * Nothing calls this yet: existing call sites (`OrchestratorModal`,
- * `CardDetailModal`, `ListColumn`, `WorkspaceProvider`) still use bare
- * `fetch('/api/...')`. The autonomy phase migrates them here when it flips
- * AUTH_REQUIRED=true.
+ * Every AI call made by the autonomy engine (and WorkspaceProvider's manual
+ * agent-run path) goes through here — bare `fetch('/api/...')` calls 401 now
+ * that AUTH_REQUIRED defaults to true.
  */
 export async function apiPost<T>(path: string, body: unknown, opts?: ApiPostOptions): Promise<T> {
   const idempotencyKey = opts?.idempotencyKey;
@@ -65,6 +65,7 @@ export async function apiPost<T>(path: string, body: unknown, opts?: ApiPostOpti
       method: "POST",
       headers,
       body: JSON.stringify(body),
+      signal: opts?.signal,
     });
   };
 

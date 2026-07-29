@@ -34,6 +34,7 @@ import { BoardData, RBACRole } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { IconButton } from './ui/IconButton';
+import { AutonomyPill } from '../features/runs/AutonomyPill';
 
 
 interface NavbarProps {
@@ -471,6 +472,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           )}
         </div>
+
+        {/* Autonomy status + Pause All (self-contained; hidden when signed out) */}
+        <AutonomyPill />
 
         {/* Real-Time Telemetry & Activity Feed */}
         <button

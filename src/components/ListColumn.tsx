@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { CardItemData, ListConfig, ListType, RBACRole } from '../types';
 import { CardItem } from './CardItem';
+import { apiPost } from '../lib/api/client';
 
 interface ListColumnProps {
   list: ListConfig;
@@ -159,15 +160,16 @@ export const ListColumn: React.FC<ListColumnProps> = ({
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
           const base64Audio = (reader.result as string).split(',')[1];
-          // Call transcribe API
-          const res = await fetch('/api/transcribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audioData: base64Audio, mimeType: 'audio/webm' })
-          });
-          const data = await res.json();
-          if (data.text) {
-            onSendChatMessage(list.id, data.text);
+          try {
+            const data = await apiPost<{ text?: string }>('/api/transcribe', {
+              audioData: base64Audio,
+              mimeType: 'audio/webm'
+            });
+            if (data.text) {
+              onSendChatMessage(list.id, data.text);
+            }
+          } catch (err) {
+            console.error('Transcribe error:', err);
           }
         };
       };

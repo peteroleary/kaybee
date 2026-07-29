@@ -38,24 +38,21 @@ function extractBearerToken(req: express.Request): string | undefined {
  * Verifies `Authorization: Bearer <idToken>` via the Firebase Admin SDK
  * (`getAuth().verifyIdToken`), populating `req.uid` / `req.email` on success.
  *
- * Gated on the `AUTH_REQUIRED` env var, which defaults to *disabled*
- * ("false"/unset). While disabled this middleware is a pass-through: it never
- * rejects a request, but still best-effort decodes a bearer token if one is
- * present (so downstream rate limiting can key off uid instead of IP). A
- * loud one-time warning is logged at boot when auth is not enforced.
- *
- * This default is deliberate — the client does not yet send ID tokens on
- * /api calls (src/lib/api/client.ts exists but is not wired into any
- * component), so enforcing auth now would break every AI feature. The phase
- * that adds the autonomy engine flips the default to true.
+ * Auth is ENFORCED BY DEFAULT (Phase 4): the autonomy run loop must never
+ * reach an unauthenticated Gemini proxy. Set `AUTH_REQUIRED=false` to opt out
+ * for local development only (e.g. exercising signed-out flows without a
+ * Firebase session) — while disabled this middleware is a pass-through: it
+ * never rejects a request, but still best-effort decodes a bearer token if
+ * one is present (so downstream rate limiting can key off uid instead of IP).
+ * A loud one-time warning is logged at boot when auth is not enforced.
  */
 export function requireAuth(): express.RequestHandler {
-  const authRequired = process.env.AUTH_REQUIRED === "true";
+  const authRequired = process.env.AUTH_REQUIRED !== "false";
 
   if (!authRequired) {
     console.warn(
-      '[auth] AUTH_REQUIRED is not "true" — /api routes (except /health) are NOT verifying Firebase ID ' +
-        "tokens. This is a deliberate temporary Phase 7 default; a later phase flips AUTH_REQUIRED=true."
+      '[auth] AUTH_REQUIRED=false — /api routes (except /health) are NOT verifying Firebase ID ' +
+        "tokens. Intended for local development only; do not deploy with auth disabled."
     );
   }
 

@@ -37,6 +37,7 @@ import { Modal } from './ui/Modal';
 import { AgentPicker } from '../features/agents/AgentPicker';
 import { useAgents } from '../state/AgentProvider';
 import { AgentDoc } from '../lib/agents/types';
+import { apiPost } from '../lib/api/client';
 
 interface CardDetailModalProps {
   card: CardItemData | null;
@@ -148,21 +149,19 @@ export const CardDetailModal: React.FC<CardDetailModalProps> = ({
   const handleGenerateSuggestions = async () => {
     setIsGeneratingSuggestions(true);
     try {
-      const res = await fetch('/api/smart-suggestions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: editedCard.title,
-          description: editedCard.description,
-          entityType: editedCard.entityType,
-          priority: editedCard.priority,
-          tags: editedCard.tags
-        })
+      const data = await apiPost<{
+        summary?: string;
+        suggestedSubtasks?: { id: string; text: string; completed: boolean }[];
+        suggestedWidgets?: InteractiveWidget[];
+        suggestedWorkflow?: { name: string; agentRole: string; description: string; suggestedTags: string[] } | null;
+      }>('/api/smart-suggestions', {
+        title: editedCard.title,
+        description: editedCard.description,
+        entityType: editedCard.entityType,
+        priority: editedCard.priority,
+        tags: editedCard.tags
       });
-      if (res.ok) {
-        const data = await res.json();
-        setSuggestions(data);
-      }
+      setSuggestions(data);
     } catch (err) {
       console.error('Smart suggestions error:', err);
     } finally {
