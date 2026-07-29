@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ApiClientError } from '../../lib/api/client';
 import { useAgents } from '../../state/AgentProvider';
 import { useUiState } from '../../state/UiStateProvider';
+import { useAutonomy } from '../runs/AutonomyContext';
 import { useWorkspace } from '../../state/WorkspaceProvider';
 import { buildOrchestratorContext } from '../../lib/orchestrator/context';
 import { findSupersededByNewProposal } from '../../lib/orchestrator/proposals';
@@ -71,6 +72,7 @@ export function useOrchestratorState(): OrchestratorApi {
   const { user } = useAuth();
   const workspace = useWorkspace();
   const { agents } = useAgents();
+  const autonomy = useAutonomy();
   const ui = useUiState();
 
   const store: ThreadStore = useMemo(() => createThreadStore(user?.uid ?? null), [user?.uid]);
@@ -147,8 +149,19 @@ export function useOrchestratorState(): OrchestratorApi {
           activeBoardId: workspace.activeBoardId,
           goals: workspace.goals,
           agents,
-          autonomy: null,
-          runs: [],
+          autonomy: {
+            enabled: autonomy.policy.enabled,
+            maxRunsTotal: autonomy.policy.budget.maxRunsTotal,
+            runsUsed: autonomy.policy.budget.runsUsed,
+          },
+          runs: [...autonomy.runs]
+            .sort((a, b) => b.queuedAt - a.queuedAt)
+            .map(r => ({
+              id: r.id,
+              cardTitle: r.cardTitle,
+              status: r.status,
+              createdAt: new Date(r.queuedAt).toISOString(),
+            })),
         });
 
         const thread = threadsRef.current.find(t => t.id === threadId) ?? null;
@@ -202,7 +215,7 @@ export function useOrchestratorState(): OrchestratorApi {
         setSending(false);
       }
     },
-    [store, workspace, agents]
+    [store, workspace, agents, autonomy]
   );
 
   const send = useCallback(
