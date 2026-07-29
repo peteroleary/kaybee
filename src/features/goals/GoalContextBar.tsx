@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { useAutonomy } from '../runs/AutonomyContext';
 import { useOrchestrator } from '../orchestrator/OrchestratorProvider';
 import { useUiState } from '../../state/UiStateProvider';
+import { ShareControl } from '../share/ShareControl';
 import type { UserGoal } from '../../types';
 
 /**
@@ -59,6 +60,8 @@ export function GoalContextBar({ goal }: { goal: UserGoal }) {
       </span>
 
       <div className="flex-1" />
+
+      <ShareControl goal={goal} />
 
       <Button variant="ghost" size="sm" onClick={openThread} title="Open this goal's orchestrator thread">
         <MessageSquare className="w-3.5 h-3.5" />

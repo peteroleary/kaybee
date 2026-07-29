@@ -38,6 +38,8 @@ export interface UserGoal {
    *  src/lib/autonomy/eligibility.ts (false opts the goal out; with
    *  requireApprovalForFirstRunOfGoal, true is the approval). */
   autonomy?: { enabled?: boolean } | null;
+  /** Active guest share token (goalShares/{token}) — null when not shared. */
+  shareToken?: string | null;
   /** Lifecycle of the AI-generated plan attached to this goal. 'stale' is reserved for
    *  when the goal's own definition changes after a plan was proposed/applied. */
   planStatus: 'none' | 'proposed' | 'applied' | 'stale';

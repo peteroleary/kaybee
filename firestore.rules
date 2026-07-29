@@ -92,6 +92,32 @@ service cloud.firestore {
       }
     }
 
+    // We3 guest share links: the unguessable token IS the capability. Anyone
+    // can GET one share doc by id (never list) and read/post comments under
+    // it; comments become unreadable the moment the share is revoked (the
+    // parent-exists check). Only the owner creates, refreshes, or revokes.
+    match /goalShares/{token} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if creatingOwn();
+      allow update: if owns(resource) && ownerUnchanged();
+      allow delete: if owns(resource);
+
+      match /comments/{commentId} {
+        allow read: if exists(/databases/$(database)/documents/goalShares/$(token));
+        allow create: if exists(/databases/$(database)/documents/goalShares/$(token))
+          && request.resource.data.keys().hasOnly(['author', 'text', 'createdAt'])
+          && request.resource.data.author is string
+          && request.resource.data.author.size() <= 80
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 2000
+          && request.resource.data.createdAt is string;
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+
     // Activity log is append-only: no update, no delete.
     match /activity/{activityId} {
       allow read: if owns(resource);
