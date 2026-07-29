@@ -7,6 +7,7 @@ import { cn } from '../../lib/cn';
 import { useWorkspace } from '../../state/WorkspaceProvider';
 import { useOrchestrator } from '../orchestrator/OrchestratorProvider';
 import type { UserGoal } from '../../types';
+import { AttentionQueue } from './AttentionQueue';
 import { GoalCard } from './GoalCard';
 
 /**
@@ -118,12 +119,13 @@ export function GoalHome() {
           </Button>
         </Panel>
 
+        <AttentionQueue />
+
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-fg flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-accent-hi" />
             <span>Active Goals</span>
-          </h2>
-          {activeGoals.length === 0 ? (
+          </h2>          {activeGoals.length === 0 ? (
             <Panel className="p-6 text-center text-sm text-fg-muted">No active goals yet. Create one above to get started.</Panel>
           ) : (
             <div className="space-y-3">
