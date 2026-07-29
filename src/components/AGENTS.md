@@ -2,13 +2,13 @@
 
 ## Purpose
 
-The `src/components/` directory contains all modular React UI components, canvas renders, navigation headers, and modal dialogs.
+The `src/components/` directory contains generic React UI chrome: canvas renders, navigation header, modal dialogs, and shared `ui/` primitives. Feature-specific UI lives under `src/features/`.
 
 ## Ownership
 
-- Navbar (`Navbar.tsx`) with Firebase Auth status and canvas toolbars.
+- Navbar (`Navbar.tsx`) with Firebase Auth status, canvas toolbars, the Orchestrator dock trigger (primary action), and the embedded `AutonomyPill`.
 - Board canvas (`BoardCanvas.tsx`) and card detail renders (`CardDetailModal.tsx`).
-- Feature modals (AI Orchestrator, Analytics, Interconnect, Voice, Theme, Tag Manager).
+- Feature modals (Analytics, Interconnect, Voice, Theme, Tag Manager).
 
 ## Local Contracts
 

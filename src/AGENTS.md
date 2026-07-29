@@ -32,6 +32,7 @@ The `src/` directory owns the frontend web application built with React 19, Type
 
 - [src/components/AGENTS.md](file:///Users/po/Desktop/kaybee/src/components/AGENTS.md): Reusable UI components, modals, navbar, and canvas widgets.
 - [src/context/AGENTS.md](file:///Users/po/Desktop/kaybee/src/context/AGENTS.md): Global React Context providers (Firebase Authentication session state).
+- [src/features/AGENTS.md](file:///Users/po/Desktop/kaybee/src/features/AGENTS.md): Feature-specific UI (goals, agents, orchestrator dock, autonomy runs) paired with `src/lib/` domain libraries.
 - [src/hooks/AGENTS.md](file:///Users/po/Desktop/kaybee/src/hooks/AGENTS.md): Reserved for component/feature-scoped custom hooks (currently empty; global state moved to `src/state/`).
 - [src/lib/AGENTS.md](file:///Users/po/Desktop/kaybee/src/lib/AGENTS.md): Firebase Web SDK initialization, Auth helpers, and API clients.
 - [src/server/AGENTS.md](file:///Users/po/Desktop/kaybee/src/server/AGENTS.md): Modular Express backend server routes and Gemini AI integration.
